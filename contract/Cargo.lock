@@ -1399,7 +1399,10 @@ checksum = "85e60b0d1b5f99db2556934e21937020776a5d31520bf169e851ac44e6420214"
 name = "your_performance_tracker"
 version = "1.0.0"
 dependencies = [
+ "chrono",
  "near-sdk",
+ "strum",
+ "strum_macros",
  "uint",
 ]
 

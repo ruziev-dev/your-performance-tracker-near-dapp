@@ -1,64 +1,96 @@
+extern crate core;
+
+mod app_challenge;
+mod app_user;
+
 use near_sdk::borsh::{self, BorshDeserialize, BorshSerialize};
-use near_sdk::{log, near_bindgen};
+use near_sdk::{log, near_bindgen, env};
+use near_sdk::collections::{LookupMap, Vector};
+use crate::app_challenge::{Challenge, ProofType};
+use crate::app_user::User;
 
-// Define the default message
-const DEFAULT_MESSAGE: &str = "Hello";
 
-// Define the contract structure
 #[near_bindgen]
 #[derive(BorshDeserialize, BorshSerialize)]
 pub struct Contract {
-    message: String,
+    pub users: LookupMap<String, User>,
 }
 
-// Define the default, which automatically initializes the contract
-impl Default for Contract{
-    fn default() -> Self{
-        Self{message: DEFAULT_MESSAGE.to_string()}
+impl Default for Contract {
+    fn default() -> Self {
+        Self {
+            users: LookupMap::new(b"m")
+        }
     }
 }
 
-// Implement the contract structure
 #[near_bindgen]
 impl Contract {
-    // Public method - returns the greeting saved, defaulting to DEFAULT_MESSAGE
-    pub fn get_greeting(&self) -> String {
-        return self.message.clone();
+    #[payable]
+    pub fn add_user_holding_tokens(&mut self) {
+        let account_name = env::predecessor_account_id().to_string();
+        let deposit = env::attached_deposit();
+        let account_previous_data = self.users.get(&account_name);
+        let mut user = User {
+            hold: deposit,
+            challenges: Vector::new(b"m"),
+        };
+
+        match account_previous_data {
+            Some(user_data) => {
+                user.hold = &user.hold + &user_data.hold;
+                if user_data.challenges.len() > 0 {
+                    user.challenges = user_data.challenges;
+                }
+            }
+            _ => ()
+        }
+
+        self.users.insert(&account_name, &user);
+        log!(
+            "User {} call method add_user_hold with deposit {:?}, total hold: {:?}",
+            account_name,
+            deposit,
+            user.hold
+        );
     }
 
-    // Public method - accepts a greeting, such as "howdy", and records it
-    pub fn set_greeting(&mut self, message: String) {
-        // Use env::log to record logs permanently to the blockchain!
-        log!("Saving greeting {}", message);
-        self.message = message;
+
+    pub fn add_challenge(&mut self) {
+        let account_name = env::predecessor_account_id().to_string();
+        let mut user = self.users
+            .get(&account_name)
+            .expect("Your account hasn't held any deposit. Use add_user_holding_tokens() contract call");
+
+
+        let challenge = Challenge {
+            group_uuid: "123456".to_string(),
+            name: "".to_string(),
+            uuid: "124314343".to_string(),
+            expiration_date: "3455".to_string(),
+            bet: 0,
+            executed: false,
+            proof_type: ProofType::NONE,
+            proof_data: "".to_string(),
+        };
+
+
+        log!("Challenge {:?} has been added to user {}",challenge, account_name);
+        user.challenges.push(&challenge);
     }
 }
 
-/*
- * The rest of this file holds the inline tests for the code above
- * Learn more about Rust tests: https://doc.rust-lang.org/book/ch11-01-writing-tests.html
- */
 #[cfg(test)]
 mod tests {
-    use super::*;
+    //use near_sdk::testing_env;
+    //use super::*;
 
-    #[test]
-    fn get_default_greeting() {
-        let contract = Contract::default();
-        // this test did not call set_greeting so should return the default "Hello" greeting
-        assert_eq!(
-            contract.get_greeting(),
-            "Hello".to_string()
-        );
-    }
-
-    #[test]
-    fn set_then_get_greeting() {
-        let mut contract = Contract::default();
-        contract.set_greeting("howdy".to_string());
-        assert_eq!(
-            contract.get_greeting(),
-            "howdy".to_string()
-        );
-    }
+    /* #[test]
+     fn add_user_holding_tokens() {
+         let mut contract = Contract::default();
+         let user_account = "test_user.near".to_string();
+         &contract.add_user_holding_tokens(user_account);
+         println!("{:?}", contract.users.get(&user_account).unwrap().hold);
+         assert_eq!(&user_account, &user_account);
+     }*/
 }

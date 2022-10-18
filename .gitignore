@@ -11,6 +11,10 @@ target
 /out
 dist
 .parcel-cache
+
+#IDE
+.idea
+
 # keys
 /templates/react/neardev
 
