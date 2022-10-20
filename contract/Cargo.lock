@@ -1401,6 +1401,7 @@ version = "1.0.0"
 dependencies = [
  "chrono",
  "near-sdk",
+ "serde_json",
  "strum",
  "strum_macros",
  "uint",
