@@ -3,8 +3,13 @@ import React, { FC } from "react";
 import { SideMenu } from "../components/SideMenu";
 import { Header } from "../components/Header";
 import { Stack } from "@mui/system";
-import store from "../../store/store";
-
+import { Route, Routes } from "react-router-dom";
+import { VIEWS } from "../views/navigation";
+import { Challenges } from "../views/Challenges";
+import { AddNewChallenge } from "../views/AddNewChallenge";
+import { Deposit } from "../views/Deposit";
+import { Withdraw } from "../views/Withdraw";
+import { NotFoundPage } from "../views/NotFoundPage";
 
 export const SignedInStack: FC = () => {
   return (
@@ -15,8 +20,19 @@ export const SignedInStack: FC = () => {
         </Grid>
         <Grid item xs={12} md={9}>
           <Stack spacing={2}>
-            <Header/>
-            <Paper sx={{ borderRadius: 5, height: 200 }}></Paper>
+            <Header />
+            <Paper sx={{ borderRadius: 5, height: "100%" }}>
+              <Routes>
+                <Route index element={<Challenges />} />
+                <Route
+                  path={VIEWS.ADD_CHALLENGE}
+                  element={<AddNewChallenge />}
+                />
+                <Route path={VIEWS.DEPOSIT} element={<Deposit />} />
+                <Route path={VIEWS.WITHDRAW} element={<Withdraw />} />
+                <Route path="*" element={<NotFoundPage />} />
+              </Routes>
+            </Paper>
           </Stack>
         </Grid>
       </Grid>

@@ -1,74 +1,45 @@
-import {
-  Avatar,
-  Divider,
-  Grid,
-  List,
-  ListItem,
-  ListItemAvatar,
-  ListItemText,
-  Paper,
-  Typography,
-  useTheme,
-} from "@mui/material";
+import { List, ListItem, Paper } from "@mui/material";
+
+import EmojiEventsTwoToneIcon from "@mui/icons-material/EmojiEventsTwoTone";
+import PlaylistAddCircleTwoToneIcon from "@mui/icons-material/PlaylistAddCircleTwoTone";
+import SwitchAccessShortcutAddTwoToneIcon from "@mui/icons-material/SwitchAccessShortcutAddTwoTone";
+import KeyboardDoubleArrowDownTwoToneIcon from "@mui/icons-material/KeyboardDoubleArrowDownTwoTone";
 import React from "react";
+import { useNavigation } from "../views/navigation";
+import { MenuItem } from "../atoms/MenuItem";
 
 export const SideMenu = () => {
-  const { palette } = useTheme();
+  const navigator = useNavigation();
   return (
     <Paper sx={{ borderRadius: 5 }}>
-      <List
-        sx={{ width: "100%" /* maxWidth: 360, bgcolor: "background.paper"  */ }}
-      >
+      <List sx={{ width: "100%" }}>
         <ListItem alignItems="flex-start" sx={{ height: 80 }}></ListItem>
 
-        <Divider variant="inset" component="li" />
-
-        <ListItem alignItems="flex-start">
-          <ListItemAvatar>
-            <Avatar alt="Remy Sharp" src="/static/images/avatar/1.jpg" />
-          </ListItemAvatar>
-          <ListItemText
-            primary="Brunch this weekend?"
-            secondary={
-              <React.Fragment>
-                <Typography
-                  sx={{ display: "inline" }}
-                  component="span"
-                  variant="body2"
-                  color="text.primary"
-                >
-                  Ali Connors
-                </Typography>
-                {" — I'll be in your neighborhood doing errands this…"}
-              </React.Fragment>
-            }
-          />
-        </ListItem>
-
-        <Divider variant="inset" component="li" />
-
-        <ListItem alignItems="flex-start">
-          <ListItemAvatar>
-            <Avatar alt="Remy Sharp" src="/static/images/avatar/1.jpg" />
-          </ListItemAvatar>
-          <ListItemText
-            primary="Brunch this weekend?"
-            secondary={
-              <React.Fragment>
-                <Typography
-                  sx={{ display: "inline" }}
-                  component="span"
-                  variant="body2"
-                  color="text.primary"
-                >
-                  Ali Connors
-                </Typography>
-                {" — I'll be in your neighborhood doing errands this…"}
-              </React.Fragment>
-            }
-          />
-        </ListItem>
+        <MenuItem
+          Icon={() => <EmojiEventsTwoToneIcon />}
+          onClick={navigator.goHome}
+          title="CHALLENGES"
+          subtitle="your challenge table"
+        />
+        <MenuItem
+          Icon={() => <PlaylistAddCircleTwoToneIcon />}
+          onClick={navigator.goAddChallengeView}
+          title="ADD NEW CHALLENGE"
+          subtitle="create your own challenge"
+        />
+        <MenuItem
+          Icon={() => <SwitchAccessShortcutAddTwoToneIcon />}
+          onClick={navigator.goDepositView}
+          title="DEPOSIT"
+          subtitle="add value to create new challenges"
+        />
+        <MenuItem
+          Icon={() => <KeyboardDoubleArrowDownTwoToneIcon />}
+          onClick={navigator.goWithdrawView}
+          title="WITHDRAW"
+          subtitle="get your free hold"
+        />
       </List>
     </Paper>
- );
+  );
 };
