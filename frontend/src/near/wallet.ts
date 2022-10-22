@@ -3,7 +3,6 @@ import { providers } from "near-api-js";
 import { setupModal } from "@near-wallet-selector/modal-ui";
 
 
-// wallet selector options
 import {
   NetworkId,
   setupWalletSelector,
@@ -25,21 +24,17 @@ export class UserWallet {
   accountId: string | null;
 
   constructor({ createAccessKeyFor, network = "testnet" }) {
-    // Login to a wallet passing a contractId will create a local
-    // key, so the user skips signing non-payable transactions.
-    // Omitting the accountId will result in the user being
-    // asked to sign all transactions.
     this.createAccessKeyFor = createAccessKeyFor;
     this.network = network;
   }
 
   // To be called when the website loads
-  async startUp() {
+  async startAndCheckAuth() {
     this.walletSelector = await setupWalletSelector({
       network: this.network as NetworkId,
       modules: [
-        setupMyNearWallet({ iconUrl: "MyNearIconUrl" }),
-        setupLedger({ iconUrl: "LedgerIconUrl" }), 
+        setupMyNearWallet({ iconUrl: "https://luralink.com/uploads/img/channel/615da92fc4e001.77198631.png" }),
+        setupLedger({ iconUrl: "https://flyclipart.com/thumbs/ledger-vault-logo-1278849.png" }), 
       ],
     });
 
@@ -51,7 +46,7 @@ export class UserWallet {
         this.walletSelector.store.getState().accounts[0].accountId;
     }
 
-    return isSignedIn;
+    return {isSignedIn, accountId: this.accountId};
   }
 
   signIn() {
@@ -59,6 +54,8 @@ export class UserWallet {
     const modal = setupModal(this.walletSelector, {
       contractId: this.createAccessKeyFor as string,
       description,
+      theme: "light"
+      
     });
     modal.show();
   }
@@ -69,7 +66,6 @@ export class UserWallet {
     window.location.replace(window.location.origin + window.location.pathname);
   }
 
-  // Make a read-only call to retrieve information from the network
   async viewMethod({ contractId, method, args = {} }) {
     const { network } = this.walletSelector.options;
     const provider = new providers.JsonRpcProvider({ url: network.nodeUrl });
@@ -84,7 +80,6 @@ export class UserWallet {
     return JSON.parse(Buffer.from(res.result).toString());
   }
 
-  // Call a method that changes the contract's state
   async callMethod({
     contractId,
     method,
@@ -92,7 +87,6 @@ export class UserWallet {
     gas = THIRTY_TGAS,
     deposit = NO_DEPOSIT,
   }) {
-    // Sign a transaction with the "FunctionCall" action
     return await this.wallet?.signAndSendTransaction({
       signerId: this.accountId as string,
       receiverId: contractId,

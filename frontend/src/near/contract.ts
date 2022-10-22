@@ -26,11 +26,11 @@ export class Contract {
       },
     });
   }
-  async viewUserAccount() {
+  async viewUserAccount(account: string) {
     return await this.wallet.viewMethod({
       contractId: this.contractId,
       method: "get_user_account",
-      args: {account_name: "ruziev_dev.testnet"}
+      args: { account_name: account },
     });
   }
 
