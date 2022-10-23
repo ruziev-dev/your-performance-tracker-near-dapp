@@ -1,7 +1,11 @@
-
-import { providers } from "near-api-js";
+import {
+  Account,
+  connect,
+  Connection,
+  keyStores,
+  providers,
+} from "near-api-js";
 import { setupModal } from "@near-wallet-selector/modal-ui";
-
 
 import {
   NetworkId,
@@ -11,6 +15,7 @@ import {
 } from "@near-wallet-selector/core";
 import { setupLedger } from "@near-wallet-selector/ledger";
 import { setupMyNearWallet } from "@near-wallet-selector/my-near-wallet";
+import { clearObserving } from "mobx/dist/internal";
 
 const THIRTY_TGAS = "30000000000000";
 const NO_DEPOSIT = "0";
@@ -33,8 +38,14 @@ export class UserWallet {
     this.walletSelector = await setupWalletSelector({
       network: this.network as NetworkId,
       modules: [
-        setupMyNearWallet({ iconUrl: "https://luralink.com/uploads/img/channel/615da92fc4e001.77198631.png" }),
-        setupLedger({ iconUrl: "https://flyclipart.com/thumbs/ledger-vault-logo-1278849.png" }), 
+        setupMyNearWallet({
+          iconUrl:
+            "https://luralink.com/uploads/img/channel/615da92fc4e001.77198631.png",
+        }),
+        setupLedger({
+          iconUrl:
+            "https://flyclipart.com/thumbs/ledger-vault-logo-1278849.png",
+        }),
       ],
     });
 
@@ -46,7 +57,7 @@ export class UserWallet {
         this.walletSelector.store.getState().accounts[0].accountId;
     }
 
-    return {isSignedIn, accountId: this.accountId};
+    return { isSignedIn, accountId: this.accountId };
   }
 
   signIn() {
@@ -54,8 +65,7 @@ export class UserWallet {
     const modal = setupModal(this.walletSelector, {
       contractId: this.createAccessKeyFor as string,
       description,
-      theme: "light"
-      
+      theme: "light",
     });
     modal.show();
   }
@@ -104,12 +114,29 @@ export class UserWallet {
     });
   }
 
-  // Get transaction result from the network
+  async getAccountBalance() {
+    const { network } = this.walletSelector.options;
+
+    const connectionConfig = {
+      networkId: this.network,
+      keyStore: new keyStores.BrowserLocalStorageKeyStore(),
+      nodeUrl: network.nodeUrl,
+      headers: {},
+    };
+
+    const nearConnection = await connect(connectionConfig);
+    let account = await nearConnection.account(this.accountId as string);
+
+    return account.getAccountBalance();
+  }
+
   async getTransactionResult(txhash) {
     const { network } = this.walletSelector.options;
+
+    let a = await this.walletSelector.wallet();
+
     const provider = new providers.JsonRpcProvider({ url: network.nodeUrl });
 
-    // Retrieve transaction result from the network
     const transaction = await provider.txStatus(txhash, "unnused");
     return providers.getTransactionLastResult(transaction);
   }

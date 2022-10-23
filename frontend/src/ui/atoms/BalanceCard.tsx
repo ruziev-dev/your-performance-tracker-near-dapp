@@ -9,6 +9,7 @@ import {
 } from "@mui/material";
 import React, { FC } from "react";
 import { DefaultComponentProps } from "@mui/material/OverridableComponent";
+import { DisplayText } from "./DisplayText";
 
 interface BalanceCardProps {
   title: string;
@@ -48,13 +49,7 @@ export const BalanceCard: FC<Props> = ({
         }}
       >
         <Box sx={{ marginTop: 1 }}>
-          <Typography
-            variant="button"
-            fontWeight="900"
-            sx={{ color: palette.text.disabled }}
-          >
-            {title.toUpperCase()}
-          </Typography>
+          <DisplayText>{title.toUpperCase()}</DisplayText>
           <Typography>
             {nearValue} {unit}
           </Typography>

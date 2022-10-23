@@ -1,12 +1,15 @@
 import { makeAutoObservable } from "mobx";
+import { AccountBalance } from "near-api-js/lib/account";
 import { Contract } from "../near/contract";
 import { UserWallet } from "../near/wallet";
 import { NearBalance, User } from "../types/contract-entities";
+import { Deposit } from "../ui/views/Deposit";
 
 class Store {
   accountId: string | null = null;
   accountTotalHold: NearBalance | null = null;
   accountFreeHold: NearBalance | null = null;
+  accountBalance: AccountBalance | null = null;
 
   private userWallet: UserWallet;
   private appContract: Contract;
@@ -34,9 +37,15 @@ class Store {
     this.isSignedIn = isSignedIn;
     this.accountId = accountId;
     if (accountId) {
-      this.userState = await this.appContract.viewUserAccount(accountId);
+      await this.updateUserState();
     }
     this.isAppInit = true;
+  }
+
+  async updateUserState() {
+    this.userState = await this.appContract.viewUserAccount(
+      this.accountId as string
+    );
   }
   changeTheme = () => (this.isDarkTheme = !this.isDarkTheme);
 
@@ -48,12 +57,26 @@ class Store {
     this.userWallet.signIn();
   }
 
+  async getAccountBalance() {
+    this.enableLoading();
+
+    this.accountBalance = await this.userWallet.getAccountBalance();
+
+    this.disableLoading();
+  }
+
   async logout() {
     this.enableLoading();
 
     this.userWallet.signOut();
     this.isSignedIn = false;
 
+    this.disableLoading();
+  }
+  async deposit(value: string) {
+    this.enableLoading();
+    await this.appContract.addHoldingTokens(value);
+    await this.updateUserState();
     this.disableLoading();
   }
 }
