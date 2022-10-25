@@ -1,11 +1,8 @@
+import { connect, keyStores, providers } from "near-api-js";
 import {
-  Account,
-  connect,
-  Connection,
-  keyStores,
-  providers,
-} from "near-api-js";
-import { setupModal } from "@near-wallet-selector/modal-ui";
+  setupModal,
+  WalletSelectorModal,
+} from "@near-wallet-selector/modal-ui";
 
 import {
   NetworkId,
@@ -15,10 +12,10 @@ import {
 } from "@near-wallet-selector/core";
 import { setupLedger } from "@near-wallet-selector/ledger";
 import { setupMyNearWallet } from "@near-wallet-selector/my-near-wallet";
-import { clearObserving } from "mobx/dist/internal";
 
 const THIRTY_TGAS = "30000000000000";
 const NO_DEPOSIT = "0";
+const LOGIN_DESCRIPTION = "Please select a wallet to sign in.";
 
 // Wallet that simplifies using the wallet selector
 export class UserWallet {
@@ -27,26 +24,23 @@ export class UserWallet {
   network: string;
   createAccessKeyFor: string | null;
   accountId: string | null;
+  modal: WalletSelectorModal;
 
   constructor({ createAccessKeyFor, network = "testnet" }) {
     this.createAccessKeyFor = createAccessKeyFor;
     this.network = network;
+
+    /* this.modal = setupModal(this.walletSelector, {
+      contractId: this.createAccessKeyFor as string,
+      description: LOGIN_DESCRIPTION,
+    }); */
   }
 
   // To be called when the website loads
   async startAndCheckAuth() {
     this.walletSelector = await setupWalletSelector({
       network: this.network as NetworkId,
-      modules: [
-        setupMyNearWallet({
-          iconUrl:
-            "https://luralink.com/uploads/img/channel/615da92fc4e001.77198631.png",
-        }),
-        setupLedger({
-          iconUrl:
-            "https://flyclipart.com/thumbs/ledger-vault-logo-1278849.png",
-        }),
-      ],
+      modules: [setupMyNearWallet(), setupLedger()],
     });
 
     const isSignedIn = this.walletSelector.isSignedIn();
@@ -60,15 +54,15 @@ export class UserWallet {
     return { isSignedIn, accountId: this.accountId };
   }
 
-  signIn() {
-    const description = "Please select a wallet to sign in.";
-    const modal = setupModal(this.walletSelector, {
+  showWalletsModal = () => {
+    this.modal = setupModal(this.walletSelector, {
       contractId: this.createAccessKeyFor as string,
-      description,
-      theme: "light",
+      description: LOGIN_DESCRIPTION,
     });
-    modal.show();
-  }
+    this.modal.show();
+  };
+
+  hideWalletsModal = () => this.modal.hide();
 
   signOut() {
     this.wallet?.signOut();

@@ -51,7 +51,7 @@ export const BalanceCard: FC<Props> = ({
         <Box sx={{ marginTop: 1 }}>
           <DisplayText>{title.toUpperCase()}</DisplayText>
           <Typography>
-            {nearValue} {unit}
+            {parseFloat(nearValue as string).toFixed(2)} {unit}
           </Typography>
         </Box>
         <Avatar

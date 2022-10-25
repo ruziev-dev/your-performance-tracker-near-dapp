@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import {
   Box,
   CardContent,
-  Chip,
   InputAdornment,
   OutlinedInput,
   Typography,
@@ -10,8 +9,8 @@ import {
 import { observer } from "mobx-react-lite";
 import store from "../../store/store";
 import { toNear } from "../../utils/helpers";
-import { DisplayText } from "../atoms/DisplayText";
 import { ActionButton } from "../atoms/ActionButton";
+import { BalanceInputChipsHelper } from "../components/BalanceInputChipsHelper";
 
 export const Deposit = observer(() => {
   useEffect(() => {
@@ -42,14 +41,26 @@ export const Deposit = observer(() => {
     }
   };
 
-  const deposit = () => store.deposit(value)
+  const deposit = () => store.deposit(value);
+
+  const setFixValue = (percantage: number) => () => {
+    setError(false);
+    setValue(String(Number(maxNearBalance) * percantage));
+  };
+
+  const heplerChips = [
+    { text: "25%", onClick: setFixValue(0.25) },
+    { text: "50%", onClick: setFixValue(0.5) },
+    { text: "75%", onClick: setFixValue(0.75) },
+    { text: `max ${maxNearBalance} Ⓝ`, onClick: setFixValue(1) },
+  ];
+
   return (
     <Box
       sx={{
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        height: 500,
       }}
     >
       <CardContent
@@ -64,8 +75,8 @@ export const Deposit = observer(() => {
         </Typography>
 
         <OutlinedInput
-          error={isError}
           id="outlined-adornment-weight"
+          error={isError}
           value={value}
           onChange={onChangeValue}
           endAdornment={<InputAdornment position="end">Ⓝ</InputAdornment>}
@@ -74,44 +85,17 @@ export const Deposit = observer(() => {
             "aria-label": "weight",
           }}
         />
-        <Box
-          sx={{
-            display: "flex",
-            flexDirection: "row",
-            justifyContent: "flex-end",
-            gap: 1,
-            mt: 1,
-            mb: 1,
-          }}
-        >
-          <Chip
-            color="secondary"
-            onClick={() => setValue(String(Number(maxNearBalance) * 0.25))}
-            label={<DisplayText>25%</DisplayText>}
-          />
-          <Chip
-            color="secondary"
-            onClick={() => setValue(String(Number(maxNearBalance) * 0.5))}
-            label={<DisplayText>50%</DisplayText>}
-          />
-          <Chip
-            color="secondary"
-            onClick={() => setValue(String(Number(maxNearBalance) * 0.75))}
-            label={<DisplayText>75%</DisplayText>}
-          />
-          <Chip
-            color="secondary"
-            onClick={() => setValue(maxNearBalance)}
-            label={<DisplayText>max {maxNearBalance} Ⓝ</DisplayText>}
-          />
-        </Box>
+
+        <BalanceInputChipsHelper chips={heplerChips} />
 
         <ActionButton
+          isLoading={store.isLoading}
           title="DEPOSIT"
           disabled={isError || value === ""}
           onClick={deposit}
         />
       </CardContent>
+      <ActionButton title="test Alert" onClick={store.showAlert} />
     </Box>
   );
 });

@@ -8,6 +8,7 @@ import { CssBaseline, ThemeProvider } from "@mui/material";
 import { darkTheme, lightTheme } from "./ui/theme/theme";
 import { observer } from "mobx-react-lite";
 import store from "./store/store";
+import { AlertContainer } from "./ui/views/AlertContainer";
 
 const App = observer(() => {
   useEffect(() => {
@@ -19,6 +20,7 @@ const App = observer(() => {
       <ThemeProvider theme={store.isDarkTheme ? darkTheme : lightTheme}>
         <CssBaseline />
         {store.isSignedIn ? <SignedInStack /> : <UnsignedInStack />}
+        <AlertContainer />
       </ThemeProvider>
     </BrowserRouter>
   );

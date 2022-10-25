@@ -1,7 +1,14 @@
 /* Talking with a contract often involves transforming data, we recommend you to encapsulate that logic into a class */
 
 import { utils } from "near-api-js";
+import { Challange } from "../types/contract-entities";
 import { UserWallet } from "./wallet";
+
+export enum PROOF_TYPE {
+  NONE = 0,
+  TEXT = 1,
+  MEDIA = 2,
+}
 
 export class Contract {
   contractId: string;
@@ -11,17 +18,14 @@ export class Contract {
     this.wallet = walletToUse;
   }
 
-  async addChallenge() {
+  async addChallenge(data: Challange) {
     return await this.wallet.callMethod({
       contractId: this.contractId,
       method: "add_challenge",
       args: {
         args: {
-          group_uuid: "1223456",
-          uuid: "42352",
-          name: "Name 1",
-          bet: utils.format.parseNearAmount("2"),
-          expiration_date: new Date().toUTCString(),
+          ...data,
+          bet: utils.format.parseNearAmount(data.bet),
         },
       },
     });
@@ -40,6 +44,13 @@ export class Contract {
       method: "add_user_holding_tokens",
       args: {},
       deposit: utils.format.parseNearAmount(depositData) || "",
+    });
+  }
+  async withdrawFreeHold(amount: string) {
+    return await this.wallet.callMethod({
+      contractId: this.contractId,
+      method: "withdraw_free_hold",
+      args: { amount },
     });
   }
 }

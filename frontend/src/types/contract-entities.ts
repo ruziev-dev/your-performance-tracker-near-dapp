@@ -1,3 +1,5 @@
+import { PROOF_TYPE } from "../near/contract";
+
 export type NearBalance = string;
 
 export interface User {
@@ -6,4 +8,14 @@ export interface User {
   challenges: Challange[];
 }
 
-export interface Challange {}
+export interface Challange {
+  group_uuid: string;
+  uuid: string;
+  name: string;
+  expiration_date: string;
+  bet: NearBalance;
+  executed?: boolean;
+  proof_type: PROOF_TYPE;
+  proof_data?: string;
+  ipfs?: string;
+}

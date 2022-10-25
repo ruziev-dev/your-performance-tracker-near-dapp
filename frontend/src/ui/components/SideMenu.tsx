@@ -1,4 +1,4 @@
-import { List, ListItem, Paper } from "@mui/material";
+import { List, ListItem, Paper, PaperTypeMap } from "@mui/material";
 
 import EmojiEventsTwoToneIcon from "@mui/icons-material/EmojiEventsTwoTone";
 import PlaylistAddCircleTwoToneIcon from "@mui/icons-material/PlaylistAddCircleTwoTone";
@@ -7,11 +7,14 @@ import KeyboardDoubleArrowDownTwoToneIcon from "@mui/icons-material/KeyboardDoub
 import React from "react";
 import { useNavigation } from "../views/navigation";
 import { MenuItem } from "../atoms/MenuItem";
+import { DefaultComponentProps } from "@mui/material/OverridableComponent";
 
-export const SideMenu = () => {
+type Props = DefaultComponentProps<PaperTypeMap>;
+
+export const SideMenu: React.FC<Props> = () => {
   const navigator = useNavigation();
   return (
-    <Paper sx={{ borderRadius: 5 }}>
+    <Paper sx={{ borderRadius: 5, height: "100%" }}>
       <List sx={{ width: "100%" }}>
         <ListItem alignItems="flex-start" sx={{ height: 80 }}></ListItem>
 
