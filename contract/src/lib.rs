@@ -1,6 +1,6 @@
 extern crate core;
 
-use near_sdk::{Balance, env, log, near_bindgen};
+use near_sdk::{Balance, env, log, near_bindgen, Promise};
 use near_sdk::borsh::{self, BorshDeserialize, BorshSerialize};
 use near_sdk::collections::{LookupMap, TreeMap};
 use serde_json::Value;
@@ -49,7 +49,7 @@ impl Contract {
                 user.total_hold = &user.total_hold + &user_data.total_hold;
                 user.free_hold = &user.free_hold + &user_data.free_hold;
 
-                if user_data.challenges.is_empty() {
+                if !user_data.challenges.is_empty() {
                     user.challenges = user_data.challenges;
                 }
             }
@@ -83,7 +83,10 @@ impl Contract {
         }
 
         match args.get("uuid") {
-            Some(value) => { uuid = value.as_str().unwrap().parse().unwrap() }
+            Some(value) => {
+                uuid = value.as_str().unwrap().parse().unwrap();
+                challenge.uuid = uuid.clone();
+            }
             None => { errors_buffer_message.push("uuid".to_string()) }
         }
 
@@ -105,25 +108,52 @@ impl Contract {
         let string_bet_value: String = bet_arg.as_str().unwrap().parse().unwrap();
         let new_bet = Balance::from(string_bet_value.parse::<u128>().unwrap());
 
-        if new_bet <= user.free_hold { challenge.bet = user.free_hold } else { panic!("Not enough hold balance") }
-
+        if new_bet <= user.free_hold {
+            challenge.bet = new_bet;
+            user.free_hold = user.free_hold - new_bet;
+        } else { panic!("Not enough hold balance") }
 
         user.challenges.insert(&uuid.to_string(), &challenge);
+
+        self.users.insert(&account_name, &user);
         log!("{:?} has been added to user {}", challenge, account_name);
     }
-}
 
-#[cfg(test)]
-mod tests {
-    //use near_sdk::testing_env;
-    //use super::*;
+    pub fn withdraw_free_hold(&mut self, amount: String) {
+        let balance = amount.parse::<u128>().unwrap();
+        let account_name = env::predecessor_account_id();
 
-    /* #[test]
-     fn add_user_holding_tokens() {
-         let mut contract = Contract::default();
-         let user_account = "test_user.near".to_string();
-         &contract.add_user_holding_tokens(user_account);
-         println!("{:?}", contract.users.get(&user_account).unwrap().hold);
-         assert_eq!(&user_account, &user_account);
-     }*/
+        let error_msg = format!("There is not data about account {:?} in the smart contract", account_name);
+        let mut account_previous_data = self.users.get(&account_name.to_string()).expect(&error_msg);
+
+        if balance > account_previous_data.free_hold {
+            panic!("You try to get more value that your free hold balance")
+        } else {
+            Promise::new(env::predecessor_account_id()).transfer(balance);
+            account_previous_data.free_hold = account_previous_data.free_hold - balance;
+            account_previous_data.total_hold = account_previous_data.total_hold - balance;
+            self.users.insert(&account_name.to_string(), &account_previous_data);
+        }
+    }
+
+    pub fn complete_challenge(&mut self, challenge: serde_json::Map<String, Value>) {
+        let account_name = env::predecessor_account_id().to_string();
+         let user = self.users
+             .get(&account_name)
+             .expect(&format!("There is not data for account {}", account_name));
+
+         let uuid = challenge.get("uuid")
+             .expect("There is not uuid field for challenge")
+             .as_str().unwrap().to_string();
+
+         let mut challenge = user.challenges.get(&uuid)
+             .expect("There is not challenge with such UUID");
+
+         //let exp_date = DateTime::from_utc(challenge.expiration_date.parse().unwrap(), ());
+         //let now_date = DateTime::from(env::block_timestamp().parse().unwrap(), ());
+
+         challenge.executed = true;
+
+
+    }
 }

@@ -4,7 +4,7 @@ use strum_macros::{Display};
 use near_sdk::serde::Serialize;
 
 
-#[derive(BorshDeserialize, BorshSerialize, Display,Serialize, Debug)]
+#[derive(BorshDeserialize, BorshSerialize, Display, Serialize, Debug)]
 #[serde(crate = "near_sdk::serde")]
 pub enum ProofType {
     NONE = 0,
@@ -17,6 +17,7 @@ pub enum ProofType {
 #[serde(crate = "near_sdk::serde")]
 pub struct Challenge {
     pub group_uuid: String,
+    pub uuid: String,
     pub name: String,
     pub expiration_date: String,
     pub bet: Balance,
@@ -29,6 +30,7 @@ impl Default for Challenge {
     fn default() -> Self {
         Self {
             group_uuid: "".to_string(),
+            uuid: "".to_string(),
             name: "".to_string(),
             expiration_date: "".to_string(),
             bet: 0,
