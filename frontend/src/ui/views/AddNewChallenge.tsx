@@ -71,14 +71,14 @@ export const AddNewChallenge = observer(() => {
     } else setError(true);
   };
 
-  const isReadyToSave = !!(name && bet && expDate);
+  const isReadyToSave = !!(name && bet && expDate && !isError);
 
   const saveNewChallenge = () => {
     store.createChallenge({
       proofType: selectedProofType.value,
       name,
       bet,
-      expiration: expDate?.toISOString() as string,
+      expiration: expDate?.add(1, "day").toISOString() as string,
     });
   };
   const heplerChips = [

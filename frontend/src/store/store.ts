@@ -3,7 +3,7 @@ import { makeAutoObservable, toJS } from "mobx";
 import { AccountBalance } from "near-api-js/lib/account";
 import { Contract } from "../near/contract";
 import { UserWallet } from "../near/wallet";
-import { Challange, User } from "../types/contract-entities";
+import { Challenge, User } from "../types/contract-entities";
 import { IAlert, INewChallenge } from "../types/frontend-types";
 
 const ALERT_TIME = 3000;
@@ -102,7 +102,7 @@ class Store {
   async createChallenge({ proofType, name, bet, expiration }: INewChallenge) {
     this.enableLoading();
 
-    const newTask: Challange = {
+    const newTask: Challenge = {
       group_uuid: uuidv4(),
       uuid: uuidv4(),
       name,
@@ -116,6 +116,19 @@ class Store {
       await this.updateUserState();
     } catch (error) {
       console.log("[createChallenge]:", error);
+      //todo: show alert
+    }
+    this.disableLoading();
+  }
+  async completeChallenge(uuid: string) {
+    this.enableLoading();
+
+
+    try {
+      await this.appContract.completeChallenge(uuid);
+      await this.updateUserState();
+    } catch (error) {
+      console.log("[completeChallenge]:", error);
       //todo: show alert
     }
     this.disableLoading();

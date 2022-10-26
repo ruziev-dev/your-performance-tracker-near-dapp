@@ -1,7 +1,7 @@
 /* Talking with a contract often involves transforming data, we recommend you to encapsulate that logic into a class */
 
 import { utils } from "near-api-js";
-import { Challange } from "../types/contract-entities";
+import { Challenge } from "../types/contract-entities";
 import { UserWallet } from "./wallet";
 
 export enum PROOF_TYPE {
@@ -18,7 +18,7 @@ export class Contract {
     this.wallet = walletToUse;
   }
 
-  async addChallenge(data: Challange) {
+  async addChallenge(data: Challenge) {
     return await this.wallet.callMethod({
       contractId: this.contractId,
       method: "add_challenge",
@@ -51,6 +51,13 @@ export class Contract {
       contractId: this.contractId,
       method: "withdraw_free_hold",
       args: { amount },
+    });
+  }
+  async completeChallenge(uuid: string) {
+    return await this.wallet.callMethod({
+      contractId: this.contractId,
+      method: "complete_challenge",
+      args: { uuid },
     });
   }
 }

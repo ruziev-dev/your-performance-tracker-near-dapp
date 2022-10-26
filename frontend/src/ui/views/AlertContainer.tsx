@@ -3,7 +3,6 @@ import { Stack } from "@mui/material";
 import { AppAlert } from "../components/AppAlert";
 import { observer } from "mobx-react-lite";
 import store from "../../store/store";
-import { autorun } from "mobx";
 
 export const AlertContainer: React.FC = observer(() => {
   return (
