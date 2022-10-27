@@ -65,7 +65,6 @@ impl Contract {
         );
     }
 
-
     pub fn add_challenge(&mut self, args: serde_json::Map<String, Value>) {
         let account_name = env::predecessor_account_id().to_string();
         let mut user = self.users
@@ -78,8 +77,12 @@ impl Contract {
         let mut challenge = Challenge::default();
 
         match args.get("group_uuid") {
-            Some(value) => { challenge.group_uuid = value.as_str().unwrap().parse().unwrap() }
-            None => { errors_buffer_message.push("group_uuid".to_string()) }
+            Some(value) => {
+                challenge.group_uuid = value.as_str().unwrap().parse().unwrap();
+            }
+            None => {
+                errors_buffer_message.push("group_uuid".to_string());
+            }
         }
 
         match args.get("uuid") {
@@ -91,22 +94,26 @@ impl Contract {
         }
 
         match args.get("name") {
-            Some(value) => { challenge.name = value.as_str().unwrap().parse().unwrap() }
+            Some(value) => {
+                challenge.name = value.as_str().unwrap().parse().unwrap();
+            }
             None => { errors_buffer_message.push("name".to_string()) }
         }
 
         match args.get("expiration_date") {
-            Some(value) => { challenge.expiration_date = value.as_str().unwrap().parse().unwrap() }
+            Some(value) => {
+                challenge.expiration_date = value.as_str().unwrap().parse().unwrap();
+            }
             None => { errors_buffer_message.push("expiration_date".to_string()) }
         }
 
         if errors_buffer_message.len() > 0 {
-            panic!("Fields {} are required", errors_buffer_message.join(","))
+            panic!("Fields {} are required", errors_buffer_message.join(","));
         }
 
         let bet_arg = args.get("bet").unwrap();
         let string_bet_value: String = bet_arg.as_str().unwrap().parse().unwrap();
-        let new_bet = Balance::from(string_bet_value.parse::<u128>().unwrap());
+        let new_bet = Balance::from(string_bet_value.parse::<Balance>().unwrap());
 
         if new_bet <= user.free_hold {
             challenge.bet = new_bet;
@@ -123,8 +130,13 @@ impl Contract {
         let balance = amount.parse::<u128>().unwrap();
         let account_name = env::predecessor_account_id();
 
-        let error_msg = format!("There is not data about account {:?} in the smart contract", account_name);
-        let mut account_previous_data = self.users.get(&account_name.to_string()).expect(&error_msg);
+        let error_msg = format!(
+            "There is not data about account {:?} in the smart contract",
+            account_name
+        );
+        let mut account_previous_data = self.users
+            .get(&account_name.to_string())
+            .expect(&error_msg);
 
         if balance > account_previous_data.free_hold {
             panic!("You try to get more value that your free hold balance")
@@ -138,22 +150,44 @@ impl Contract {
 
     pub fn complete_challenge(&mut self, challenge: serde_json::Map<String, Value>) {
         let account_name = env::predecessor_account_id().to_string();
-         let user = self.users
-             .get(&account_name)
-             .expect(&format!("There is not data for account {}", account_name));
+        let mut user = self.users
+            .get(&account_name)
+            .expect(&format!("There is not data for account {}", account_name));
 
-         let uuid = challenge.get("uuid")
-             .expect("There is not uuid field for challenge")
-             .as_str().unwrap().to_string();
+        let uuid = challenge
+            .get("uuid")
+            .expect("There is not uuid field for challenge")
+            .as_str()
+            .unwrap()
+            .to_string();
 
-         let mut challenge = user.challenges.get(&uuid)
-             .expect("There is not challenge with such UUID");
+        let mut challenge = user.challenges
+            .get(&uuid)
+            .expect("There is not challenge with such UUID");
 
-         //let exp_date = DateTime::from_utc(challenge.expiration_date.parse().unwrap(), ());
-         //let now_date = DateTime::from(env::block_timestamp().parse().unwrap(), ());
+        if challenge.executed {
+            panic!("The challenge is already completed");
+        } else {
+            challenge.executed = true;
+        }
 
-         challenge.executed = true;
+        // DateTime check
+        /*
+        let exp_date_time = NaiveDateTime::from_str(&challenge.expiration_date)
+           .expect("Impossible parse expiration_date");
 
+        if env::block_timestamp() > exp_date_time.timestamp() as u64 {
+            panic!("You can't complete the challenge. It's out of time")
+        }
+        let comp_date_time = NaiveDateTime::from_timestamp(env::block_timestamp() as i64, 0);
+        challenge.complete_date = comp_date_time.to_string();
 
+         */
+        // add ProofType checking
+
+        user.challenges.insert(&uuid, &challenge);
+        user.free_hold = user.free_hold + challenge.bet;
+
+        self.users.insert(&account_name, &user);
     }
 }

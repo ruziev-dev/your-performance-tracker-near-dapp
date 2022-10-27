@@ -5,7 +5,7 @@ import { DisplayText } from "./DisplayText";
 
 type ChipProps = {
   text: string | number;
-  onClick: () => void;
+  onClick?: () => void;
 };
 
 type Props = DefaultComponentProps<ChipTypeMap<ChipProps>>;

@@ -5,6 +5,7 @@ import Countdown from "react-countdown";
 import { Challenge } from "../../types/contract-entities";
 import { ActionButton } from "../atoms/ActionButton";
 import { DisplayText } from "../atoms/DisplayText";
+import { LocChip } from "../atoms/LocChip";
 
 export const ChallengesHeader: React.FC = () => {
   return (
@@ -23,12 +24,19 @@ export const ChallengesHeader: React.FC = () => {
   );
 };
 
-export const ChallengeItem: React.FC<Challenge & { onComplete: Function }> = ({
+interface Props extends Challenge {
+  onComplete: () => void;
+  isLoading: boolean;
+}
+
+export const ChallengeItem: React.FC<Props> = ({
   uuid,
   name,
   bet,
   expiration_date,
   onComplete,
+  executed,
+  isLoading,
 }) => {
   const restTime = dayjs(expiration_date).diff(Date(), "day");
   return (
@@ -38,14 +46,21 @@ export const ChallengeItem: React.FC<Challenge & { onComplete: Function }> = ({
         <ListItemText sx={{ width: 300 }}>{name}</ListItemText>
         <ListItemText sx={{ width: 100 }}>{bet} Ⓝ</ListItemText>
         <ListItemText sx={{ width: 80 }}>
-          <Countdown date={new Date(expiration_date)} renderer={renderer} />
+          {executed ? null : (
+            <Countdown date={new Date(expiration_date)} renderer={renderer} />
+          )}
         </ListItemText>
         <ListItemText sx={{ width: 100 }}>
-          <ActionButton
-            title="PROOF FINISHING"
-            sx={{ width: "100%" }}
-            onClick={onComplete}
-          />
+          {executed ? (
+            <LocChip text="Completed" color="primary" sx={{ width: "100%" }} />
+          ) : (
+            <ActionButton
+              isLoading={isLoading}
+              title="PROOF FINISHING"
+              sx={{ width: "100%" }}
+              onClick={onComplete}
+            />
+          )}
         </ListItemText>
       </ListItem>
     </React.Fragment>

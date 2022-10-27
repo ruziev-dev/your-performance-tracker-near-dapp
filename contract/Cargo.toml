@@ -11,7 +11,6 @@ crate-type = ["cdylib"]
 near-sdk = "4.0.0"
 uint = { version = "0.9.3", default-features = false }
 
-chrono = "0.4.22"
 serde_json = "1.0.86"
 strum = "0.24.1"
 strum_macros = "0.24.3"

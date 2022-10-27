@@ -1,11 +1,14 @@
 import { v4 as uuidv4 } from "uuid";
-import { makeAutoObservable, toJS } from "mobx";
+import { makeAutoObservable, toJS, configure, runInAction } from "mobx";
 import { AccountBalance } from "near-api-js/lib/account";
 import { Contract } from "../near/contract";
 import { UserWallet } from "../near/wallet";
 import { Challenge, User } from "../types/contract-entities";
 import { IAlert, INewChallenge } from "../types/frontend-types";
 
+configure({
+  enforceActions: "never",
+});
 const ALERT_TIME = 3000;
 
 class Store {
@@ -123,7 +126,6 @@ class Store {
   async completeChallenge(uuid: string) {
     this.enableLoading();
 
-
     try {
       await this.appContract.completeChallenge(uuid);
       await this.updateUserState();
@@ -142,12 +144,11 @@ class Store {
       type: "error",
       title: `qweert ${new Date()}`,
     };
-
-    console.log(toJS(this.alertState));
     this.alertState = this.alertState?.length
       ? [...this.alertState, newAlert]
       : [newAlert];
-    console.log(this.alertState);
+
+    console.log("showAlert: ", this.alertState);
 
     setTimeout(() => {
       this.alertState = this.alertState.filter(

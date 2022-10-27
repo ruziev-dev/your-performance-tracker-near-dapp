@@ -73,13 +73,17 @@ export const AddNewChallenge = observer(() => {
 
   const isReadyToSave = !!(name && bet && expDate && !isError);
 
-  const saveNewChallenge = () => {
-    store.createChallenge({
+  const saveNewChallenge = async () => {
+    await store.createChallenge({
       proofType: selectedProofType.value,
       name,
       bet,
       expiration: expDate?.add(1, "day").toISOString() as string,
     });
+    setName("")
+    setBet("")
+    setExpDate(null)
+    setProofType(defaultProof)
   };
   const heplerChips = [
     { text: "25%", onClick: setFixValue(0.25) },

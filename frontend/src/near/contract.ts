@@ -57,7 +57,7 @@ export class Contract {
     return await this.wallet.callMethod({
       contractId: this.contractId,
       method: "complete_challenge",
-      args: { uuid },
+      args: { challenge: { uuid } },
     });
   }
 }

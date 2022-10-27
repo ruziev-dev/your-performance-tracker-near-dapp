@@ -26,6 +26,7 @@ export const Challenges = observer(() => {
             <ChallengesHeader />
             {store.userState?.challenges.map((challenge) => (
               <ChallengeItem
+                isLoading={store.isLoading}
                 key={challenge.uuid}
                 {...challenge}
                 onComplete={() => store.completeChallenge(challenge.uuid)}
