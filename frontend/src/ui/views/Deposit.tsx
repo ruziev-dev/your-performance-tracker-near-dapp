@@ -59,6 +59,7 @@ export const Deposit = observer(() => {
     <Box
       sx={{
         display: "flex",
+        flexDirection: "column",
         alignItems: "center",
         justifyContent: "center",
       }}
