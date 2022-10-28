@@ -1,13 +1,14 @@
 import { Divider, ListItem, ListItemText } from "@mui/material";
-import React from "react";
+import React, { useState } from "react";
 import dayjs from "dayjs";
 import Countdown from "react-countdown";
 import { Challenge } from "../../types/contract-entities";
 import { ActionButton } from "../atoms/ActionButton";
 import { DisplayText } from "../atoms/DisplayText";
 import { LocChip } from "../atoms/LocChip";
+import { toNear } from "../../utils/helpers";
 
-export const ChallengesHeader: React.FC = () => {
+export const ChallengesHeader: React.FC = ({}) => {
   return (
     <ListItem>
       <ListItemText sx={{ width: 300 }}>
@@ -17,7 +18,7 @@ export const ChallengesHeader: React.FC = () => {
         <DisplayText>Bet</DisplayText>
       </ListItemText>
       <ListItemText sx={{ width: 100 }}>
-        <DisplayText>Deadline after</DisplayText>
+        <DisplayText>Deadline</DisplayText>
       </ListItemText>
       <ListItemText sx={{ width: 80 }}></ListItemText>
     </ListItem>
@@ -33,26 +34,32 @@ export const ChallengeItem: React.FC<Props> = ({
   uuid,
   name,
   bet,
+  complete_date,
   expiration_date,
   onComplete,
   executed,
   isLoading,
 }) => {
-  const restTime = dayjs(expiration_date).diff(Date(), "day");
   return (
     <React.Fragment>
       <Divider />
       <ListItem>
         <ListItemText sx={{ width: 300 }}>{name}</ListItemText>
-        <ListItemText sx={{ width: 100 }}>{bet} Ⓝ</ListItemText>
+        <ListItemText sx={{ width: 100 }}>{toNear(bet)} Ⓝ</ListItemText>
         <ListItemText sx={{ width: 80 }}>
-          {executed ? null : (
+          {executed ? (
+            dayjs(expiration_date).format("D MMMM YYYY")
+          ) : (
             <Countdown date={new Date(expiration_date)} renderer={renderer} />
           )}
         </ListItemText>
         <ListItemText sx={{ width: 100 }}>
           {executed ? (
-            <LocChip text="Completed" color="primary" sx={{ width: "100%" }} />
+            <LocChip
+              text={`Completed ${dayjs(complete_date).format("DD/MM/YY")}`}
+              color="primary"
+              sx={{ width: "100%" }}
+            />
           ) : (
             <ActionButton
               isLoading={isLoading}

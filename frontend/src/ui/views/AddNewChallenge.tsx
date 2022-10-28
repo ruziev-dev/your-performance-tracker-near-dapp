@@ -78,7 +78,7 @@ export const AddNewChallenge = observer(() => {
       proofType: selectedProofType.value,
       name,
       bet,
-      expiration: expDate?.add(1, "day").toISOString() as string,
+      expiration: expDate?.add(1, "day").valueOf() as number,
     });
     setName("")
     setBet("")

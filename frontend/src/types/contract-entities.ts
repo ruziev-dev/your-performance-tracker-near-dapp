@@ -12,7 +12,8 @@ export interface Challenge {
   group_uuid: string;
   uuid: string;
   name: string;
-  expiration_date: string;
+  expiration_date: number;
+  complete_date?: number;
   bet: NearBalance;
   executed?: boolean;
   proof_type: PROOF_TYPE;

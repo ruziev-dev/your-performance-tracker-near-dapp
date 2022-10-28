@@ -7,9 +7,19 @@ import PlaylistAddCircleTwoToneIcon from "@mui/icons-material/PlaylistAddCircleT
 import { useNavigation } from "./navigation";
 import { toJS } from "mobx";
 import { ChallengeItem, ChallengesHeader } from "../components/ChallengeItem";
+import { Challenge } from "../../types/contract-entities";
 
 export const Challenges = observer(() => {
   const navigation = useNavigation();
+
+  const activeChallenges: Challenge[] = [];
+  const completedChallenges: Challenge[] = [];
+
+  store.userState?.challenges.forEach((ch) => {
+    if (ch.executed) completedChallenges.push(ch);
+    else activeChallenges.push(ch);
+  });
+
   console.log("Challenges", toJS(store.userState));
   return (
     <Box
@@ -24,7 +34,15 @@ export const Challenges = observer(() => {
         <Box sx={{ flex: 1, height: "100%", padding: 2 }}>
           <List>
             <ChallengesHeader />
-            {store.userState?.challenges.map((challenge) => (
+            {activeChallenges.map((challenge) => (
+              <ChallengeItem
+                isLoading={store.isLoading}
+                key={challenge.uuid}
+                {...challenge}
+                onComplete={() => store.completeChallenge(challenge.uuid)}
+              />
+            ))}
+            {completedChallenges.map((challenge) => (
               <ChallengeItem
                 isLoading={store.isLoading}
                 key={challenge.uuid}

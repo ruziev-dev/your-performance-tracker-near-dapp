@@ -10,6 +10,8 @@ use crate::app_user::User;
 
 mod app_challenge;
 mod app_user;
+mod utils;
+
 
 #[near_bindgen]
 #[derive(BorshDeserialize, BorshSerialize)]
@@ -46,7 +48,8 @@ impl Contract {
 
         match account_previous_data {
             Some(user_data) => {
-                user.total_hold = &user.total_hold + &user_data.total_hold;
+
+                user.total_hold = &user.total_hold  + &user_data.total_hold;
                 user.free_hold = &user.free_hold + &user_data.free_hold;
 
                 if !user_data.challenges.is_empty() {
@@ -102,7 +105,7 @@ impl Contract {
 
         match args.get("expiration_date") {
             Some(value) => {
-                challenge.expiration_date = value.as_str().unwrap().parse().unwrap();
+                challenge.expiration_date = value.as_u64().unwrap();
             }
             None => { errors_buffer_message.push("expiration_date".to_string()) }
         }
@@ -113,7 +116,7 @@ impl Contract {
 
         let bet_arg = args.get("bet").unwrap();
         let string_bet_value: String = bet_arg.as_str().unwrap().parse().unwrap();
-        let new_bet = Balance::from(string_bet_value.parse::<Balance>().unwrap());
+        let new_bet = string_bet_value.parse::<Balance>().unwrap();
 
         if new_bet <= user.free_hold {
             challenge.bet = new_bet;
@@ -127,7 +130,7 @@ impl Contract {
     }
 
     pub fn withdraw_free_hold(&mut self, amount: String) {
-        let balance = amount.parse::<u128>().unwrap();
+        let balance = amount.parse::<Balance>().unwrap();
         let account_name = env::predecessor_account_id();
 
         let error_msg = format!(
@@ -141,7 +144,7 @@ impl Contract {
         if balance > account_previous_data.free_hold {
             panic!("You try to get more value that your free hold balance")
         } else {
-            Promise::new(env::predecessor_account_id()).transfer(balance);
+            Promise::new(env::predecessor_account_id()).transfer(Balance::from(balance));
             account_previous_data.free_hold = account_previous_data.free_hold - balance;
             account_previous_data.total_hold = account_previous_data.total_hold - balance;
             self.users.insert(&account_name.to_string(), &account_previous_data);
@@ -171,18 +174,16 @@ impl Contract {
             challenge.executed = true;
         }
 
-        // DateTime check
-        /*
-        let exp_date_time = NaiveDateTime::from_str(&challenge.expiration_date)
-           .expect("Impossible parse expiration_date");
-
-        if env::block_timestamp() > exp_date_time.timestamp() as u64 {
-            panic!("You can't complete the challenge. It's out of time")
+        let current_time = env::block_timestamp() / 1_000_000;
+        if current_time > challenge.expiration_date {
+            panic!("You can't complete the challenge. It's out of time deadline: {} current: {}",
+                   challenge.expiration_date,
+                   current_time
+            )
         }
-        let comp_date_time = NaiveDateTime::from_timestamp(env::block_timestamp() as i64, 0);
-        challenge.complete_date = comp_date_time.to_string();
 
-         */
+        challenge.complete_date = current_time;
+
         // add ProofType checking
 
         user.challenges.insert(&uuid, &challenge);

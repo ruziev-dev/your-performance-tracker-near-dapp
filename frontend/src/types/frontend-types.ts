@@ -13,5 +13,5 @@ export interface INewChallenge {
   proofType: PROOF_TYPE;
   name: string;
   bet: NearBalance;
-  expiration: string;
+  expiration: number;
 }
