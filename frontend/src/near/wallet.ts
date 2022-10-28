@@ -124,6 +124,12 @@ export class UserWallet {
     return account.getAccountBalance();
   }
 
+  openAccountInExplorer = () => {
+    const { network } = this.walletSelector.options;
+    const url = `${network.explorerUrl}/accounts/${this.accountId}`;
+    window.open(url, "_blank")?.focus();
+  };
+
   async getTransactionResult(txhash) {
     const { network } = this.walletSelector.options;
 

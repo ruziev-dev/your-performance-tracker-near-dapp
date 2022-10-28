@@ -157,6 +157,10 @@ class Store {
       console.log(this.alertState);
     }, ALERT_TIME);
   }
+
+  openAccountInExplorer = () => {
+    this.userWallet.openAccountInExplorer();
+  };
 }
 
 let store = new Store();
