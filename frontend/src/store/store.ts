@@ -1,15 +1,15 @@
 import { v4 as uuidv4 } from "uuid";
-import { makeAutoObservable, toJS, configure, runInAction } from "mobx";
+import { makeAutoObservable, configure } from "mobx";
 import { AccountBalance } from "near-api-js/lib/account";
 import { Contract } from "../near/contract";
 import { UserWallet } from "../near/wallet";
 import { Challenge, User } from "../types/contract-entities";
-import { IAlert, INewChallenge } from "../types/frontend-types";
+import { INewChallenge } from "../types/frontend-types";
+import { showAlertGlobal } from "../ui/views/AlertProvider";
 
 configure({
   enforceActions: "never",
 });
-const ALERT_TIME = 3000;
 
 class Store {
   accountId: string | null = null;
@@ -22,7 +22,6 @@ class Store {
   isLoading = false;
   isAppInit = true;
   isDarkTheme = true;
-  alertState: IAlert[] = [];
 
   userState: User | null = null;
 
@@ -85,7 +84,7 @@ class Store {
       await this.updateUserState();
     } catch (error) {
       console.log("[deposit]:", error);
-      //todo: show alert
+      this.showErrorAlert(error.message);
     }
     this.disableLoading();
   }
@@ -96,7 +95,7 @@ class Store {
       await this.updateUserState();
     } catch (error) {
       console.log("[withdraw]:", error);
-      //todo: show alert
+      this.showErrorAlert(error.message);
     }
 
     this.disableLoading();
@@ -115,11 +114,11 @@ class Store {
     };
 
     try {
-      await this.appContract.addChallenge(newTask);
+      let result = await this.appContract.addChallenge(newTask);
       await this.updateUserState();
     } catch (error) {
       console.log("[createChallenge]:", error);
-      //todo: show alert
+      this.showErrorAlert(error.message);
     }
     this.disableLoading();
   }
@@ -127,35 +126,38 @@ class Store {
     this.enableLoading();
 
     try {
-      await this.appContract.completeChallenge(uuid);
+      let result = await this.appContract.completeChallenge(uuid);
+      console.log("result", result)
       await this.updateUserState();
     } catch (error) {
+      this.showErrorAlert(error.message);
       console.log("[completeChallenge]:", error);
-      //todo: show alert
     }
     this.disableLoading();
   }
 
-  //todo: make it private
-  showAlert() {
-    const newAlert: IAlert = {
-      key: uuidv4(),
-      message: "test msg",
+  showErrorAlert(msg: string) {
+    showAlertGlobal({
       type: "error",
-      title: `qweert ${new Date()}`,
-    };
-    this.alertState = this.alertState?.length
-      ? [...this.alertState, newAlert]
-      : [newAlert];
+      title: "Error",
+      message: msg,
+    });
+  }
 
-    console.log("showAlert: ", this.alertState);
+  showInfoAlert(msg: string) {
+    showAlertGlobal({
+      type: "info",
+      title: "Info",
+      message: msg,
+    });
+  }
 
-    setTimeout(() => {
-      this.alertState = this.alertState.filter(
-        (alertObj) => alertObj.key !== newAlert.key
-      );
-      console.log(this.alertState);
-    }, ALERT_TIME);
+  showWarnAlert(msg: string) {
+    showAlertGlobal({
+      type: "warning",
+      title: "Warning",
+      message: msg,
+    });
   }
 
   openAccountInExplorer = () => {

@@ -36,6 +36,7 @@ export const Challenges = observer(() => {
             <ChallengesHeader />
             {activeChallenges.map((challenge) => (
               <ChallengeItem
+              
                 isLoading={store.isLoading}
                 key={challenge.uuid}
                 {...challenge}

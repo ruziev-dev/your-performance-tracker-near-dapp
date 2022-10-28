@@ -1,5 +1,5 @@
 import { Divider, ListItem, ListItemText } from "@mui/material";
-import React, { useState } from "react";
+import React from "react";
 import dayjs from "dayjs";
 import Countdown from "react-countdown";
 import { Challenge } from "../../types/contract-entities";
@@ -43,7 +43,7 @@ export const ChallengeItem: React.FC<Props> = ({
   return (
     <React.Fragment>
       <Divider />
-      <ListItem>
+      <ListItem sx={{ height: 65 }}>
         <ListItemText sx={{ width: 300 }}>{name}</ListItemText>
         <ListItemText sx={{ width: 100 }}>{toNear(bet)} Ⓝ</ListItemText>
         <ListItemText sx={{ width: 80 }}>

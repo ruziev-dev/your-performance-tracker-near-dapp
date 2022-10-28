@@ -96,7 +96,6 @@ export const Deposit = observer(() => {
           onClick={deposit}
         />
       </CardContent>
-      <ActionButton title="test Alert" onClick={store.showAlert} />
     </Box>
   );
 });

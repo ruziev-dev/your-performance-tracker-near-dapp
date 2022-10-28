@@ -29,14 +29,8 @@ export class UserWallet {
   constructor({ createAccessKeyFor, network = "testnet" }) {
     this.createAccessKeyFor = createAccessKeyFor;
     this.network = network;
-
-    /* this.modal = setupModal(this.walletSelector, {
-      contractId: this.createAccessKeyFor as string,
-      description: LOGIN_DESCRIPTION,
-    }); */
   }
 
-  // To be called when the website loads
   async startAndCheckAuth() {
     this.walletSelector = await setupWalletSelector({
       network: this.network as NetworkId,
@@ -81,6 +75,7 @@ export class UserWallet {
       args_base64: Buffer.from(JSON.stringify(args)).toString("base64"),
       finality: "optimistic",
     });
+    //@ts-ignore
     return JSON.parse(Buffer.from(res.result).toString());
   }
 
