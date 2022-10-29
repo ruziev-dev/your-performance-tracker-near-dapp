@@ -12,6 +12,9 @@ import {
 } from "@near-wallet-selector/core";
 import { setupLedger } from "@near-wallet-selector/ledger";
 import { setupMyNearWallet } from "@near-wallet-selector/my-near-wallet";
+import { setupSender } from "@near-wallet-selector/sender";
+import { setupMeteorWallet } from "@near-wallet-selector/meteor-wallet";
+import { setupMathWallet } from "@near-wallet-selector/math-wallet";
 
 const THIRTY_TGAS = "30000000000000";
 const NO_DEPOSIT = "0";
@@ -34,7 +37,13 @@ export class UserWallet {
   async startAndCheckAuth() {
     this.walletSelector = await setupWalletSelector({
       network: this.network as NetworkId,
-      modules: [setupMyNearWallet(), setupLedger()],
+      modules: [
+        setupMyNearWallet(),
+        setupLedger(),
+        setupSender(),
+        //setupMeteorWallet(),
+        //setupMathWallet(),
+      ],
     });
 
     const isSignedIn = this.walletSelector.isSignedIn();
@@ -45,6 +54,8 @@ export class UserWallet {
         this.walletSelector.store.getState().accounts[0].accountId;
     }
 
+    this.walletSelector.on("uriChanged", (data: any) => {console.log("uriChanged event", data)})
+    this.walletSelector.on("networkChanged", (data: any) => {console.log("networkChanged event", data)})
     return { isSignedIn, accountId: this.accountId };
   }
 
@@ -107,7 +118,7 @@ export class UserWallet {
     const { network } = this.walletSelector.options;
 
     const connectionConfig = {
-      networkId: this.network,
+      networkId: network.networkId,
       keyStore: new keyStores.BrowserLocalStorageKeyStore(),
       nodeUrl: network.nodeUrl,
       headers: {},

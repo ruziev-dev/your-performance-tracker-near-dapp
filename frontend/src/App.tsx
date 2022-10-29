@@ -1,4 +1,5 @@
 import "regenerator-runtime/runtime";
+import '../assets/global.css';
 
 import React, { useEffect } from "react";
 import { BrowserRouter } from "react-router-dom";

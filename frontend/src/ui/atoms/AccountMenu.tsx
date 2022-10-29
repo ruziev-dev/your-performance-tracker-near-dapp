@@ -27,10 +27,16 @@ export default function AccountMenu() {
   };
 
   const { palette } = useTheme();
+
+  let name = store.accountId;
+  const accountName =
+    name && name?.length > 25
+      ? `${name.slice(0, 8)}...${name.slice(-9)}`
+      : name;
+
   return (
     <>
       <Button
-        //onClick={() => store.logout()}
         startIcon={<AccountCircleTwoToneIcon />}
         color="info"
         id="basic-button"
@@ -39,7 +45,7 @@ export default function AccountMenu() {
         aria-expanded={open ? "true" : undefined}
         onClick={handleClick}
       >
-        {store.accountId}
+        {accountName}
       </Button>
       <Menu
         id="basic-menu"
