@@ -1,12 +1,13 @@
 import { Divider, ListItem, ListItemText } from "@mui/material";
-import React from "react";
+import React, { useEffect } from "react";
 import dayjs from "dayjs";
 import Countdown from "react-countdown";
 import { Challenge } from "../../types/contract-entities";
 import { ActionButton } from "../atoms/ActionButton";
 import { DisplayText } from "../atoms/DisplayText";
 import { LocChip } from "../atoms/LocChip";
-import { toNear } from "../../utils/helpers";
+import { formatTimeWithZero, toNear } from "../../utils/helpers";
+import store from "../../store/store";
 
 export const ChallengesHeader: React.FC = ({}) => {
   return (
@@ -38,8 +39,10 @@ export const ChallengeItem: React.FC<Props> = ({
   expiration_date,
   onComplete,
   executed,
+  wasted,
   isLoading,
 }) => {
+  const isEnded = executed || wasted;
   return (
     <React.Fragment>
       <Divider />
@@ -47,17 +50,28 @@ export const ChallengeItem: React.FC<Props> = ({
         <ListItemText sx={{ width: 300 }}>{name}</ListItemText>
         <ListItemText sx={{ width: 100 }}>{toNear(bet)} Ⓝ</ListItemText>
         <ListItemText sx={{ width: 80 }}>
-          {executed ? (
+          {isEnded ? (
             dayjs(expiration_date).format("D MMMM YYYY")
           ) : (
-            <Countdown date={new Date(expiration_date)} renderer={renderer} />
+            <Countdown
+              // when out is time
+              onComplete={() => console.log("Countdown onComplete")}
+              date={new Date(expiration_date)}
+              renderer={(props) => (
+                <TimeRenderer {...props} wasted={wasted} uuid={uuid} />
+              )}
+            />
           )}
         </ListItemText>
         <ListItemText sx={{ width: 100 }}>
-          {executed ? (
+          {isEnded ? (
             <LocChip
-              text={`Completed ${dayjs(complete_date).format("DD/MM/YY")}`}
-              color="primary"
+              text={
+                wasted
+                  ? "WASTED"
+                  : `Completed ${dayjs(complete_date).format("DD/MM/YY")}`
+              }
+              color={wasted ? "error" : "primary"}
               sx={{ width: "100%" }}
             />
           ) : (
@@ -74,8 +88,22 @@ export const ChallengeItem: React.FC<Props> = ({
   );
 };
 
-const formatWithZero = (value: number) => (value < 10 ? `0${value}` : value);
-const renderer = ({ days, hours, minutes, seconds, completed }) => {
+const TimeRenderer = ({
+  days,
+  hours,
+  minutes,
+  seconds,
+  completed,
+  wasted,
+  uuid,
+}) => {
+  useEffect(() => {
+    if (completed && !wasted) {
+      setTimeout(() => store.completeChallenge(uuid), 2000);
+      //store.completeChallenge(uuid);
+    }
+  }, [completed]);
+
   if (completed) {
     return <DisplayText>You lose 😔</DisplayText>;
   } else {
@@ -84,8 +112,8 @@ const renderer = ({ days, hours, minutes, seconds, completed }) => {
     return (
       <div>
         <p>{!!days && dayStr}</p>
-        {formatWithZero(hours)}:{formatWithZero(minutes)}:
-        {formatWithZero(seconds)}
+        {formatTimeWithZero(hours)}:{formatTimeWithZero(minutes)}:
+        {formatTimeWithZero(seconds)}
       </div>
     );
   }

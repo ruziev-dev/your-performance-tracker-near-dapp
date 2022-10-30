@@ -47,15 +47,12 @@ export class UserWallet {
     });
 
     const isSignedIn = this.walletSelector.isSignedIn();
-
     if (isSignedIn) {
       this.wallet = await this.walletSelector.wallet();
       this.accountId =
         this.walletSelector.store.getState().accounts[0].accountId;
     }
 
-    this.walletSelector.on("uriChanged", (data: any) => {console.log("uriChanged event", data)})
-    this.walletSelector.on("networkChanged", (data: any) => {console.log("networkChanged event", data)})
     return { isSignedIn, accountId: this.accountId };
   }
 

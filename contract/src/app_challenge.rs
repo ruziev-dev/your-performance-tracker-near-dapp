@@ -26,6 +26,7 @@ pub struct Challenge {
     #[serde(with = "u128_dec_format")]
     pub bet: Balance,
     pub executed: bool,
+    pub wasted: bool,
     pub proof_type: ProofType,
     pub proof_data: String,
 }
@@ -40,6 +41,7 @@ impl Default for Challenge {
             complete_date: Timestamp::default(),
             bet: Balance::default(),
             executed: false,
+            wasted: false,
             proof_type: ProofType::NONE,
             proof_data: "".to_string()
         }

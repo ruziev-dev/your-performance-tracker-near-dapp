@@ -11,6 +11,7 @@ use crate::app_user::User;
 mod app_challenge;
 mod app_user;
 mod utils;
+mod tests;
 
 
 #[near_bindgen]
@@ -48,8 +49,7 @@ impl Contract {
 
         match account_previous_data {
             Some(user_data) => {
-
-                user.total_hold = &user.total_hold  + &user_data.total_hold;
+                user.total_hold = &user.total_hold + &user_data.total_hold;
                 user.free_hold = &user.free_hold + &user_data.free_hold;
 
                 if !user_data.challenges.is_empty() {
@@ -151,18 +151,11 @@ impl Contract {
         }
     }
 
-    pub fn complete_challenge(&mut self, challenge: serde_json::Map<String, Value>) {
+    pub fn complete_challenge(&mut self, uuid: String) {
         let account_name = env::predecessor_account_id().to_string();
         let mut user = self.users
             .get(&account_name)
             .expect(&format!("There is not data for account {}", account_name));
-
-        let uuid = challenge
-            .get("uuid")
-            .expect("There is not uuid field for challenge")
-            .as_str()
-            .unwrap()
-            .to_string();
 
         let mut challenge = user.challenges
             .get(&uuid)
@@ -170,24 +163,25 @@ impl Contract {
 
         if challenge.executed {
             panic!("The challenge is already completed");
-        } else {
-            challenge.executed = true;
         }
 
         let current_time = env::block_timestamp() / 1_000_000;
-        if current_time > challenge.expiration_date {
-            panic!("You can't complete the challenge. It's out of time deadline: {} current: {}",
-                   challenge.expiration_date,
-                   current_time
-            )
-        }
+        if current_time < challenge.expiration_date {
+            challenge.executed = true;
+        } else { challenge.wasted = true; }
 
         challenge.complete_date = current_time;
 
-        // add ProofType checking
+        if challenge.executed {
+            // add ProofType checking or panic!
+            user.free_hold = user.free_hold + challenge.bet;
+        }
+
+        if challenge.wasted {
+            user.total_hold = user.total_hold - challenge.bet;
+        }
 
         user.challenges.insert(&uuid, &challenge);
-        user.free_hold = user.free_hold + challenge.bet;
 
         self.users.insert(&account_name, &user);
     }

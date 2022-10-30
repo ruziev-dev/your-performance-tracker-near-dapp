@@ -13,14 +13,14 @@ export const Challenges = observer(() => {
   const navigation = useNavigation();
 
   const activeChallenges: Challenge[] = [];
-  const completedChallenges: Challenge[] = [];
+  const finishedChallenges: Challenge[] = [];
 
-  store.userState?.challenges.forEach((ch) => {
-    if (ch.executed) completedChallenges.push(ch);
+  toJS(store.userState?.challenges)?.forEach((ch) => {
+    if (ch.executed || ch.wasted) finishedChallenges.push(ch);
     else activeChallenges.push(ch);
   });
 
-  console.log("Challenges", toJS(store.userState));
+  console.log("Challenges", activeChallenges, finishedChallenges);
   return (
     <Box
       sx={{
@@ -36,14 +36,13 @@ export const Challenges = observer(() => {
             <ChallengesHeader />
             {activeChallenges.map((challenge) => (
               <ChallengeItem
-              
                 isLoading={store.isLoading}
                 key={challenge.uuid}
                 {...challenge}
                 onComplete={() => store.completeChallenge(challenge.uuid)}
               />
             ))}
-            {completedChallenges.map((challenge) => (
+            {finishedChallenges.map((challenge) => (
               <ChallengeItem
                 isLoading={store.isLoading}
                 key={challenge.uuid}

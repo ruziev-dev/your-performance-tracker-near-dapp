@@ -124,10 +124,10 @@ class Store {
   }
   async completeChallenge(uuid: string) {
     this.enableLoading();
-
+    console.log("completeChallenge", uuid);
     try {
       let result = await this.appContract.completeChallenge(uuid);
-      console.log("result", result)
+      console.log("result", result);
       await this.updateUserState();
     } catch (error) {
       this.showErrorAlert(error.message);

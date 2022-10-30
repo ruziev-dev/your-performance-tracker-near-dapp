@@ -1,5 +1,3 @@
-/* Talking with a contract often involves transforming data, we recommend you to encapsulate that logic into a class */
-
 import { utils } from "near-api-js";
 import { Challenge } from "../types/contract-entities";
 import { UserWallet } from "./wallet";
@@ -57,7 +55,7 @@ export class Contract {
     return await this.wallet.callMethod({
       contractId: this.contractId,
       method: "complete_challenge",
-      args: { challenge: { uuid } },
+      args: { uuid },
     });
   }
 }

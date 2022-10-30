@@ -1,6 +1,6 @@
 # Your Performance Tracker NEAR dApp
 
-Work example of contract
+Work example of CONTRACT
 
 ```js
 class Contract {
@@ -29,13 +29,13 @@ class Contract {
 
 ## 1. Build and Deploy the Contract
 
-You can automatically compile and deploy the contract in the NEAR testnet by running:
+You can automatically compile and deploy the CONTRACT in the NEAR testnet by running:
 
 ```bash
 ./deploy.sh
 ```
 
-Once finished, check the `neardev/dev-account` file to find the address in which the contract was deployed:
+Once finished, check the `neardev/dev-account` file to find the address in which the CONTRACT was deployed:
 
 ```bash
 cat ./neardev/dev-account

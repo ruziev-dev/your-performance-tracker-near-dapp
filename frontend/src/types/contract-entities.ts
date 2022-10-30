@@ -16,6 +16,7 @@ export interface Challenge {
   complete_date?: number;
   bet: NearBalance;
   executed?: boolean;
+  wasted?: boolean;
   proof_type: PROOF_TYPE;
   proof_data?: string;
   ipfs?: string;

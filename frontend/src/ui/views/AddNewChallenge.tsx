@@ -78,12 +78,12 @@ export const AddNewChallenge = observer(() => {
       proofType: selectedProofType.value,
       name,
       bet,
-      expiration: expDate?.add(1, "day").valueOf() as number,
+      expiration: expDate?.add(1, "day").add(-1, "s").valueOf() as number,
     });
-    setName("")
-    setBet("")
-    setExpDate(null)
-    setProofType(defaultProof)
+    setName("");
+    setBet("");
+    setExpDate(null);
+    setProofType(defaultProof);
   };
   const heplerChips = [
     { text: "25%", onClick: setFixValue(0.25) },
