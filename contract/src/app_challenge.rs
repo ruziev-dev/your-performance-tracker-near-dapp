@@ -1,13 +1,13 @@
 use near_sdk::{Balance, Timestamp};
 use near_sdk::borsh::{self, BorshDeserialize, BorshSerialize};
-use strum_macros::{Display};
 use near_sdk::serde::{Serialize};
 
 use crate::utils::u128_dec_format;
+use serde_repr::{Serialize_repr, Deserialize_repr};
 
 
-#[derive(BorshDeserialize, BorshSerialize, Display, Serialize, Debug)]
-#[serde(crate = "near_sdk::serde")]
+#[derive(Serialize_repr, BorshSerialize, BorshDeserialize, Deserialize_repr, PartialEq, Debug)]
+#[repr(u8)]
 pub enum ProofType {
     NONE = 0,
     TEXT = 1,
@@ -43,7 +43,7 @@ impl Default for Challenge {
             executed: false,
             wasted: false,
             proof_type: ProofType::NONE,
-            proof_data: "".to_string()
+            proof_data: "".to_string(),
         }
     }
 }

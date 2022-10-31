@@ -113,7 +113,7 @@ mod tests {
 
         testing_env!(context.clone());
 
-        contract.complete_challenge(TEST_CHALLENGE_UUID.to_string());
+        contract.complete_challenge(TEST_CHALLENGE_UUID.to_string(), None);
     }
 
     #[test]
@@ -129,7 +129,7 @@ mod tests {
         testing_env!(context.clone());
 
 
-        contract.complete_challenge(TEST_CHALLENGE_UUID.to_string());
+        contract.complete_challenge(TEST_CHALLENGE_UUID.to_string(), None);
     }
 
     #[test]
@@ -144,7 +144,7 @@ mod tests {
 
         testing_env!(context.clone());
 
-        contract.complete_challenge(TEST_CHALLENGE_UUID.to_string());
+        contract.complete_challenge(TEST_CHALLENGE_UUID.to_string(), None);
 
         let user_new_state = contract.users
             .get(&accounts(0).to_string())
