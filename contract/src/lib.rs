@@ -1,11 +1,11 @@
-extern crate core;
+
 
 use near_sdk::{Balance, env, log, near_bindgen, Promise};
 use near_sdk::borsh::{self, BorshDeserialize, BorshSerialize};
 use near_sdk::collections::{LookupMap, TreeMap};
 use serde_json::Value;
 
-use crate::app_challenge::Challenge;
+use crate::app_challenge::{Challenge, ProofType};
 use crate::app_user::User;
 
 mod app_challenge;
@@ -123,6 +123,17 @@ impl Contract {
             user.free_hold = user.free_hold - new_bet;
         } else { panic!("Not enough hold balance") }
 
+
+        let proof_type = args.get("proof_type").unwrap();
+        if proof_type.is_number() {
+            if proof_type.eq(&1) {
+                challenge.proof_type = ProofType::TEXT
+            } else if proof_type.eq(&2) {
+                challenge.proof_type = ProofType::MEDIA
+            }
+        }
+
+
         user.challenges.insert(&uuid.to_string(), &challenge);
 
         self.users.insert(&account_name, &user);
@@ -151,7 +162,7 @@ impl Contract {
         }
     }
 
-    pub fn complete_challenge(&mut self, uuid: String) {
+    pub fn complete_challenge(&mut self, uuid: String, proof_data: Option<String>) {
         let account_name = env::predecessor_account_id().to_string();
         let mut user = self.users
             .get(&account_name)
@@ -163,26 +174,38 @@ impl Contract {
 
         if challenge.executed {
             panic!("The challenge is already completed");
-        }
+        } else if challenge.wasted { panic!("The challenge is already wasted"); }
 
         let current_time = env::block_timestamp() / 1_000_000;
+
         if current_time < challenge.expiration_date {
             challenge.executed = true;
-        } else { challenge.wasted = true; }
-
-        challenge.complete_date = current_time;
-
-        if challenge.executed {
-            // add ProofType checking or panic!
             user.free_hold = user.free_hold + challenge.bet;
-        }
 
-        if challenge.wasted {
+            match challenge.proof_type {
+                ProofType::TEXT => {
+                    match proof_data {
+                        None => panic!("You have to add proof_data field to finish challenge"),
+                        Some(data) => { challenge.proof_data = data }
+                    }
+                }
+                ProofType::MEDIA => {
+                    match proof_data {
+                        None => panic!("You have to add proof_data field to finish challenge"),
+                        Some(data) => { challenge.proof_data = data }
+                    }
+                }
+                ProofType::NONE => {}
+            }
+        } else {
+            challenge.wasted = true;
             user.total_hold = user.total_hold - challenge.bet;
         }
 
-        user.challenges.insert(&uuid, &challenge);
+        challenge.complete_date = current_time;
 
+
+        user.challenges.insert(&uuid, &challenge);
         self.users.insert(&account_name, &user);
     }
 }

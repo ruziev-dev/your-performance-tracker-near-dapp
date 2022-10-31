@@ -55,7 +55,7 @@ export const Challenges = observer(() => {
       ) : (
         <ActionButton
           isLoading={store.isLoading}
-          title="ADD NEW Challenge"
+          title="ADD NEW CHALLENGE"
           startIcon={<PlaylistAddCircleTwoToneIcon />}
           onClick={navigation.goAddChallengeView}
         />
