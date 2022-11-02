@@ -51,11 +51,11 @@ export class Contract {
       args: { amount },
     });
   }
-  async completeChallenge(uuid: string) {
+  async completeChallenge(uuid: string, proof_data?: string) {
     return await this.wallet.callMethod({
       contractId: this.contractId,
       method: "complete_challenge",
-      args: { uuid },
+      args: { uuid, proof_data},
     });
   }
 }

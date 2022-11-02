@@ -1,6 +1,6 @@
 import { AlertColor } from "@mui/material";
 import { PROOF_TYPE } from "../near/contract";
-import { NearBalance } from "./contract-entities";
+import { Challenge, NearBalance } from "./contract-entities";
 
 export interface IAlert {
   key: string;
@@ -14,4 +14,15 @@ export interface INewChallenge {
   name: string;
   bet: NearBalance;
   expiration: number;
+}
+
+export interface AppModal {
+  challenge: Challenge
+  title: string;
+  subtitle: string;
+  proofData: string;
+  contentType: "text" | "media";
+  actionName: string;
+  action: (...args: any) => Promise<void>;
+  onProofDataChange: () => void;
 }

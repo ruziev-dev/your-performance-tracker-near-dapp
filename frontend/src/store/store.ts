@@ -1,10 +1,10 @@
 import { v4 as uuidv4 } from "uuid";
 import { makeAutoObservable, configure } from "mobx";
 import { AccountBalance } from "near-api-js/lib/account";
-import { Contract } from "../near/contract";
+import { Contract, PROOF_TYPE } from "../near/contract";
 import { UserWallet } from "../near/wallet";
 import { Challenge, User } from "../types/contract-entities";
-import { INewChallenge } from "../types/frontend-types";
+import { AppModal, INewChallenge } from "../types/frontend-types";
 import { showAlertGlobal } from "../ui/views/AlertProvider";
 
 configure({
@@ -23,6 +23,7 @@ class Store {
   isAppInit = true;
   isDarkTheme = true;
 
+  modalState: AppModal | null = null;
   userState: User | null = null;
 
   constructor() {
@@ -122,11 +123,11 @@ class Store {
     }
     this.disableLoading();
   }
-  async completeChallenge(uuid: string) {
+  async completeChallenge(uuid: string, proof_data?: string) {
     this.enableLoading();
     console.log("completeChallenge", uuid);
     try {
-      let result = await this.appContract.completeChallenge(uuid);
+      let result = await this.appContract.completeChallenge(uuid, proof_data);
       console.log("result", result);
       await this.updateUserState();
     } catch (error) {
@@ -158,6 +159,25 @@ class Store {
       title: "Warning",
       message: msg,
     });
+  }
+
+  showModal(challenge: Challenge) {
+    const proofType =
+      challenge.proof_type === PROOF_TYPE.TEXT ? "text" : "media";
+
+    this.modalState = {
+      challenge,
+      title: "Add proof data to the challenge",
+      subtitle: `You have set ${proofType}-note proof type to challenge "${challenge.name}"`,
+      proofData: "",
+      actionName: `Save the ${proofType} data`,
+      action: this.completeChallenge.bind(this),
+      onProofDataChange: () => {},
+      contentType: proofType,
+    };
+  }
+  hideModal() {
+    this.modalState = null;
   }
 
   openAccountInExplorer = () => {

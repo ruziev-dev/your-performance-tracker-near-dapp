@@ -27,7 +27,7 @@ export const ChallengesHeader: React.FC = ({}) => {
 };
 
 interface Props extends Challenge {
-  onComplete: () => void;
+  onComplete?: () => void;
   isLoading: boolean;
 }
 

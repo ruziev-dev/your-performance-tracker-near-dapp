@@ -1,5 +1,3 @@
-
-
 use near_sdk::{Balance, env, log, near_bindgen, Promise};
 use near_sdk::borsh::{self, BorshDeserialize, BorshSerialize};
 use near_sdk::collections::{LookupMap, TreeMap};
@@ -31,9 +29,10 @@ impl Default for Contract {
 #[near_bindgen]
 impl Contract {
     pub fn get_user_account(self, account_name: String) -> User {
-        self.users
-            .get(&account_name)
-            .expect(&format!("Account {} hasn't been founded, call method add_user_holding_tokens to add account", &account_name))
+        self.users.get(&account_name)
+            .expect(
+                &format!("Account {} hasn't been founded, call method add_user_holding_tokens to add account", &account_name)
+            )
     }
 
     #[payable]
@@ -70,9 +69,7 @@ impl Contract {
 
     pub fn add_challenge(&mut self, args: serde_json::Map<String, Value>) {
         let account_name = env::predecessor_account_id().to_string();
-        let mut user = self.users
-            .get(&account_name)
-            .expect("Your account hasn't held any deposit. Use add_user_holding_tokens() contract call");
+        let mut user = self.users.get(&account_name).expect("Your account hasn't held any deposit. Use add_user_holding_tokens() contract call");
 
         let mut errors_buffer_message: Vec<String> = Vec::new();
 
@@ -124,13 +121,17 @@ impl Contract {
         } else { panic!("Not enough hold balance") }
 
 
-        let proof_type = args.get("proof_type").unwrap();
-        if proof_type.is_number() {
-            if proof_type.eq(&1) {
-                challenge.proof_type = ProofType::TEXT
-            } else if proof_type.eq(&2) {
-                challenge.proof_type = ProofType::MEDIA
+        match args.get("proof_type") {
+            Some(proof_type) => {
+                if proof_type.is_number() {
+                    if proof_type.eq(&1) {
+                        challenge.proof_type = ProofType::TEXT
+                    } else if proof_type.eq(&2) {
+                        challenge.proof_type = ProofType::MEDIA
+                    }
+                }
             }
+            None => {}
         }
 
 
@@ -148,9 +149,7 @@ impl Contract {
             "There is not data about account {:?} in the smart contract",
             account_name
         );
-        let mut account_previous_data = self.users
-            .get(&account_name.to_string())
-            .expect(&error_msg);
+        let mut account_previous_data = self.users.get(&account_name.to_string()).expect(&error_msg);
 
         if balance > account_previous_data.free_hold {
             panic!("You try to get more value that your free hold balance")
@@ -164,13 +163,9 @@ impl Contract {
 
     pub fn complete_challenge(&mut self, uuid: String, proof_data: Option<String>) {
         let account_name = env::predecessor_account_id().to_string();
-        let mut user = self.users
-            .get(&account_name)
-            .expect(&format!("There is not data for account {}", account_name));
+        let mut user = self.users.get(&account_name).expect(&format!("There is not data for account {}", account_name));
 
-        let mut challenge = user.challenges
-            .get(&uuid)
-            .expect("There is not challenge with such UUID");
+        let mut challenge = user.challenges.get(&uuid).expect("There is not challenge with such UUID");
 
         if challenge.executed {
             panic!("The challenge is already completed");

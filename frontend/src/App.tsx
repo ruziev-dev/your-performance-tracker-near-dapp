@@ -1,5 +1,5 @@
 import "regenerator-runtime/runtime";
-import '../assets/global.css';
+import "../assets/global.css";
 
 import React, { useEffect } from "react";
 import { BrowserRouter } from "react-router-dom";
@@ -10,6 +10,7 @@ import { darkTheme, lightTheme } from "./ui/theme/theme";
 import { observer } from "mobx-react-lite";
 import store from "./store/store";
 import { AlertProvider } from "./ui/views/AlertProvider";
+import { AppModal } from "./ui/components/AppModal";
 
 const App = observer(() => {
   useEffect(() => {
@@ -22,6 +23,7 @@ const App = observer(() => {
         <AlertProvider>
           <CssBaseline />
           {store.isSignedIn ? <SignedInStack /> : <UnsignedInStack />}
+          <AppModal />
         </AlertProvider>
       </ThemeProvider>
     </BrowserRouter>

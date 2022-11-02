@@ -8,6 +8,7 @@ import { useNavigation } from "./navigation";
 import { toJS } from "mobx";
 import { ChallengeItem, ChallengesHeader } from "../components/ChallengeItem";
 import { Challenge } from "../../types/contract-entities";
+import { PROOF_TYPE } from "../../near/contract";
 
 export const Challenges = observer(() => {
   const navigation = useNavigation();
@@ -20,7 +21,27 @@ export const Challenges = observer(() => {
     else activeChallenges.push(ch);
   });
 
-  console.log("Challenges", activeChallenges, finishedChallenges);
+  const onCompleteChallenge = (challenge: Challenge, proofData?: string) => {
+    switch (challenge.proof_type) {
+      case PROOF_TYPE.NONE: {
+        store.completeChallenge(challenge.uuid);
+        return;
+      }
+      case PROOF_TYPE.TEXT: {
+        if (!proofData) {
+          store.showModal(challenge);
+          //store.completeChallenge(challenge.uuid, proofData);
+          return;
+        } else {
+        }
+      }
+      case PROOF_TYPE.MEDIA: {
+        store.showModal(challenge);
+        return;
+      }
+    }
+  };
+
   return (
     <Box
       sx={{
@@ -39,7 +60,7 @@ export const Challenges = observer(() => {
                 isLoading={store.isLoading}
                 key={challenge.uuid}
                 {...challenge}
-                onComplete={() => store.completeChallenge(challenge.uuid)}
+                onComplete={() => onCompleteChallenge(challenge)}
               />
             ))}
             {finishedChallenges.map((challenge) => (
@@ -47,7 +68,6 @@ export const Challenges = observer(() => {
                 isLoading={store.isLoading}
                 key={challenge.uuid}
                 {...challenge}
-                onComplete={() => store.completeChallenge(challenge.uuid)}
               />
             ))}
           </List>
@@ -63,3 +83,14 @@ export const Challenges = observer(() => {
     </Box>
   );
 });
+
+const style = {
+  position: "absolute" as "absolute",
+  top: "50%",
+  left: "50%",
+  transform: "translate(-50%, -50%)",
+  width: 400,
+  bgcolor: "background.paper",
+  boxShadow: 24,
+  p: 4,
+};
