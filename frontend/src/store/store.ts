@@ -6,6 +6,7 @@ import { UserWallet } from "../near/wallet";
 import { Challenge, User } from "../types/contract-entities";
 import { AppModal, INewChallenge } from "../types/frontend-types";
 import { showAlertGlobal } from "../ui/views/AlertProvider";
+import { ipfs } from "../api/ipfs";
 
 configure({
   enforceActions: "never",
@@ -17,6 +18,7 @@ class Store {
 
   private userWallet: UserWallet;
   private appContract: Contract;
+  private ipfs = ipfs;
 
   isSignedIn = false;
   isLoading = false;
@@ -115,7 +117,7 @@ class Store {
     };
 
     try {
-      let result = await this.appContract.addChallenge(newTask);
+      await this.appContract.addChallenge(newTask);
       await this.updateUserState();
     } catch (error) {
       console.log("[createChallenge]:", error);
@@ -129,6 +131,23 @@ class Store {
     try {
       let result = await this.appContract.completeChallenge(uuid, proof_data);
       console.log("result", result);
+      await this.updateUserState();
+    } catch (error) {
+      this.showErrorAlert(error.message);
+      console.log("[completeChallenge]:", error);
+    }
+    this.disableLoading();
+  }
+
+  async completeChallengeWithFile(uuid: string, file: File) {
+    this.enableLoading();
+    console.log("completeChallengeWithFile", { uuid, file });
+    try {
+      const fileRes = await this.ipfs.addFile(file);
+      console.log("result", fileRes);
+
+      const chResult = await this.appContract.completeChallenge(uuid, fileRes);
+      console.log("result", chResult);
       await this.updateUserState();
     } catch (error) {
       this.showErrorAlert(error.message);
@@ -171,8 +190,6 @@ class Store {
       subtitle: `You have set ${proofType}-note proof type to challenge "${challenge.name}"`,
       proofData: "",
       actionName: `Save the ${proofType} data`,
-      action: this.completeChallenge.bind(this),
-      onProofDataChange: () => {},
       contentType: proofType,
     };
   }

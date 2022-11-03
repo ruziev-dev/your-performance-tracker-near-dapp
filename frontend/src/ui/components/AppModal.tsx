@@ -6,11 +6,20 @@ import { ActionButton } from "../atoms/ActionButton";
 import PlaylistAddCircleTwoToneIcon from "@mui/icons-material/PlaylistAddCircleTwoTone";
 import { DisplayText } from "../atoms/DisplayText";
 import { Stack } from "@mui/system";
+import { DropFileInput } from "./FileInput/FileInput";
+import { PROOF_TYPE } from "../../near/contract";
 
 export const AppModal = observer(() => {
+  const [fileValue, setFile] = useState<File | null>(null);
   const [textValue, setTextValue] = useState("");
 
+  const isBtnDisabled =
+    store?.modalState?.challenge.proof_type === PROOF_TYPE.MEDIA
+      ? !fileValue
+      : !textValue.trim();
+
   const onClose = () => {
+    setFile(null);
     setTextValue("");
     store.hideModal();
   };
@@ -20,9 +29,28 @@ export const AppModal = observer(() => {
   };
 
   const onClickButton = async () => {
-    store?.modalState
-      ?.action(store?.modalState?.challenge.uuid as string, textValue.trim())
-      .then(onClose);
+    switch (store?.modalState?.challenge.proof_type) {
+      case PROOF_TYPE.TEXT: {
+        store
+          .completeChallenge(
+            store?.modalState?.challenge.uuid as string,
+            textValue.trim()
+          )
+          .then(onClose);
+        return;
+      }
+
+      case PROOF_TYPE.MEDIA: {
+        if (fileValue)
+          store
+            .completeChallengeWithFile(
+              store?.modalState?.challenge.uuid as string,
+              fileValue
+            )
+            .then(onClose);
+        return;
+      }
+    }
   };
 
   return (
@@ -47,16 +75,21 @@ export const AppModal = observer(() => {
           <Typography id="modal-modal-description" sx={{ mt: 2 }}>
             {store?.modalState?.subtitle}
           </Typography>
-          <TextField
-            id="outlined-multiline-static"
-            label="Text note"
-            multiline
-            rows={4}
-            value={textValue}
-            onChange={onChangeValue}
-          />
+          {store?.modalState?.contentType === "text" ? (
+            <TextField
+              id="outlined-multiline-static"
+              label="Text note"
+              multiline
+              rows={4}
+              value={textValue}
+              onChange={onChangeValue}
+            />
+          ) : (
+            <DropFileInput file={fileValue} setFile={setFile} />
+          )}
+
           <ActionButton
-            disabled={!textValue.trim()}
+            disabled={isBtnDisabled}
             isLoading={store.isLoading}
             title={store?.modalState?.actionName || "SAVE"}
             startIcon={<PlaylistAddCircleTwoToneIcon />}

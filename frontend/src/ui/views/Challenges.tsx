@@ -21,25 +21,10 @@ export const Challenges = observer(() => {
     else activeChallenges.push(ch);
   });
 
-  const onCompleteChallenge = (challenge: Challenge, proofData?: string) => {
-    switch (challenge.proof_type) {
-      case PROOF_TYPE.NONE: {
-        store.completeChallenge(challenge.uuid);
-        return;
-      }
-      case PROOF_TYPE.TEXT: {
-        if (!proofData) {
-          store.showModal(challenge);
-          //store.completeChallenge(challenge.uuid, proofData);
-          return;
-        } else {
-        }
-      }
-      case PROOF_TYPE.MEDIA: {
-        store.showModal(challenge);
-        return;
-      }
-    }
+  const onCompleteChallenge = (challenge: Challenge) => {
+    if (challenge.proof_type === PROOF_TYPE.NONE)
+      store.completeChallenge(challenge.uuid);
+    else store.showModal(challenge);
   };
 
   return (
@@ -83,14 +68,3 @@ export const Challenges = observer(() => {
     </Box>
   );
 });
-
-const style = {
-  position: "absolute" as "absolute",
-  top: "50%",
-  left: "50%",
-  transform: "translate(-50%, -50%)",
-  width: 400,
-  bgcolor: "background.paper",
-  boxShadow: 24,
-  p: 4,
-};

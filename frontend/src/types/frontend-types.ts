@@ -23,6 +23,4 @@ export interface AppModal {
   proofData: string;
   contentType: "text" | "media";
   actionName: string;
-  action: (...args: any) => Promise<void>;
-  onProofDataChange: () => void;
 }

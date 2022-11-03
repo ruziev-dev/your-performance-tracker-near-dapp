@@ -1,13 +1,16 @@
-import { Divider, ListItem, ListItemText } from "@mui/material";
-import React, { useEffect } from "react";
+import { Avatar, Divider, ListItem, ListItemText } from "@mui/material";
+import React, { useEffect, useState } from "react";
 import dayjs from "dayjs";
 import Countdown from "react-countdown";
 import { Challenge } from "../../types/contract-entities";
 import { ActionButton } from "../atoms/ActionButton";
 import { DisplayText } from "../atoms/DisplayText";
 import { LocChip } from "../atoms/LocChip";
-import { formatTimeWithZero, toNear } from "../../utils/helpers";
+import { fileToBase64, formatTimeWithZero, toNear } from "../../utils/helpers";
 import store from "../../store/store";
+import { PROOF_TYPE } from "../../near/contract";
+import { ipfs } from "../../api/ipfs";
+import { Box } from "@mui/system";
 
 export const ChallengesHeader: React.FC = ({}) => {
   return (
@@ -31,6 +34,12 @@ interface Props extends Challenge {
   isLoading: boolean;
 }
 
+const emojiKit = {
+  default: "🤷‍♂️",
+  text: "📝",
+  media: "📷",
+};
+
 export const ChallengeItem: React.FC<Props> = ({
   uuid,
   name,
@@ -41,13 +50,53 @@ export const ChallengeItem: React.FC<Props> = ({
   executed,
   wasted,
   isLoading,
+  proof_type,
+  proof_data,
 }) => {
+  const [icon, setIcon] = useState(emojiKit.default);
+  const [picture, setPicture] = useState("");
+
+  useEffect(() => {
+    switch (proof_type) {
+      case PROOF_TYPE.MEDIA: {
+        setIcon(emojiKit.media);
+        break;
+      }
+      case PROOF_TYPE.TEXT: {
+        setIcon(emojiKit.text);
+        break;
+      }
+      default:
+        setIcon(emojiKit.default);
+        break;
+    }
+    if (proof_type === PROOF_TYPE.MEDIA && proof_data)
+      ipfs
+        .getFile(proof_data)
+        .then((file) =>
+          fileToBase64(file).then((base64) => setPicture(base64))
+        );
+  }, []);
+
+  //if (proof_type === PROOF_TYPE.MEDIA && proof_data) ipfs.getFile(proof_data);
   const isEnded = executed || wasted;
   return (
     <React.Fragment>
       <Divider />
       <ListItem sx={{ height: 65 }}>
-        <ListItemText sx={{ width: 300 }}>{name}</ListItemText>
+        <ListItemText sx={{ width: 300 }}>
+          <Box
+            sx={{
+              display: "flex",
+              flexDirection: "row",
+              alignItems: "center",
+              gap: 2,
+            }}
+          >
+            <Avatar src={picture} sx={{bgcolor: "transparent"}}>{icon}</Avatar>
+            {name}
+          </Box>
+        </ListItemText>
         <ListItemText sx={{ width: 100 }}>{toNear(bet)} Ⓝ</ListItemText>
         <ListItemText sx={{ width: 80 }}>
           {isEnded ? (

@@ -1,12 +1,11 @@
 html {
-  --bg: #efefef;
-  --fg: #1e1e1e;
-  --gray: #555;
-  --light-gray: #ccc;
-  --shadow: #e6e6e6;
-  --success: rgb(90, 206, 132);
-  --primary: #ff585d;
-  --secondary: #0072ce;
+  --bg: #011e3c;
+  --fg: #212b45;
+  --success: #0d6ce8;
+  --primary: #1ea51d;
+  --secondary: #a51da5;
+  --warning: #ffcd05;
+  --error: #d62237;
 
   background-color: var(--bg);
   color: var(--fg);
@@ -31,11 +30,8 @@ button:focus {
 
 @media (prefers-color-scheme: dark) {
   html {
-    --bg: #1e1e1e;
+    --bg: #011e3c;
     --fg: #efefef;
-    --gray: #aaa;
-    --shadow: #2a2a2a;
-    --light-gray: #444;
   }
   h1 {
     background-image: url(./logo-white.svg);
@@ -150,7 +146,7 @@ main.please-wait .loader:after {
   margin: 10;
   padding: 5;
   border-radius: 10;
-  background-color: #a51da5;
+  background-color: var(--secondary);
 }
 
 .nws-modal-header-wrapper {
@@ -183,7 +179,7 @@ main.please-wait .loader:after {
   text-transform: uppercase;
   font-weight: bold;
   color: #1e1e1e;
-  background-color: #ffcd05;
+  background-color: var(--warning);
   height: 30;
 }
 
@@ -191,7 +187,7 @@ main.please-wait .loader:after {
   text-transform: uppercase;
   font-weight: bold;
   color: #1e1e1e;
-  background-color: #ffcd05;
+  background-color: var(--warning);
   height: 30;
 }
 
@@ -216,5 +212,3 @@ main.please-wait .loader:after {
   margin-left: 5;
   margin-right: 5;
 }
-
-
