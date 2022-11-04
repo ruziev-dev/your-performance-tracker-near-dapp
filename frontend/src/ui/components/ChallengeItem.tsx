@@ -1,21 +1,20 @@
-import { Avatar, Divider, ListItem, ListItemText } from "@mui/material";
-import React, { useEffect, useState } from "react";
+import { Divider, ListItem, ListItemText } from "@mui/material";
+import React, { useEffect } from "react";
 import dayjs from "dayjs";
 import Countdown from "react-countdown";
 import { Challenge } from "../../types/contract-entities";
 import { ActionButton } from "../atoms/ActionButton";
 import { DisplayText } from "../atoms/DisplayText";
 import { LocChip } from "../atoms/LocChip";
-import { fileToBase64, formatTimeWithZero, toNear } from "../../utils/helpers";
+import { formatTimeWithZero, toNear } from "../../utils/helpers";
 import store from "../../store/store";
-import { PROOF_TYPE } from "../../near/contract";
-import { ipfs } from "../../api/ipfs";
 import { Box } from "@mui/system";
+import { ProofPicture } from "../atoms/ProofPicture";
 
 export const ChallengesHeader: React.FC = ({}) => {
   return (
     <ListItem>
-      <ListItemText sx={{ width: 300 }}>
+      <ListItemText sx={{ width: 300, pl: 7 }}>
         <DisplayText>Name</DisplayText>
       </ListItemText>
       <ListItemText sx={{ width: 100 }}>
@@ -34,12 +33,6 @@ interface Props extends Challenge {
   isLoading: boolean;
 }
 
-const emojiKit = {
-  default: "🤷‍♂️",
-  text: "📝",
-  media: "📷",
-};
-
 export const ChallengeItem: React.FC<Props> = ({
   uuid,
   name,
@@ -53,32 +46,6 @@ export const ChallengeItem: React.FC<Props> = ({
   proof_type,
   proof_data,
 }) => {
-  const [icon, setIcon] = useState(emojiKit.default);
-  const [picture, setPicture] = useState("");
-
-  useEffect(() => {
-    switch (proof_type) {
-      case PROOF_TYPE.MEDIA: {
-        setIcon(emojiKit.media);
-        break;
-      }
-      case PROOF_TYPE.TEXT: {
-        setIcon(emojiKit.text);
-        break;
-      }
-      default:
-        setIcon(emojiKit.default);
-        break;
-    }
-    if (proof_type === PROOF_TYPE.MEDIA && proof_data)
-      ipfs
-        .getFile(proof_data)
-        .then((file) =>
-          fileToBase64(file).then((base64) => setPicture(base64))
-        );
-  }, []);
-
-  //if (proof_type === PROOF_TYPE.MEDIA && proof_data) ipfs.getFile(proof_data);
   const isEnded = executed || wasted;
   return (
     <React.Fragment>
@@ -93,18 +60,21 @@ export const ChallengeItem: React.FC<Props> = ({
               gap: 2,
             }}
           >
-            <Avatar src={picture} sx={{bgcolor: "transparent"}}>{icon}</Avatar>
+            <ProofPicture
+              proofType={proof_type}
+              proofData={proof_data}
+              isEnded={isEnded}
+              wasted={wasted}
+            />
             {name}
           </Box>
         </ListItemText>
         <ListItemText sx={{ width: 100 }}>{toNear(bet)} Ⓝ</ListItemText>
         <ListItemText sx={{ width: 80 }}>
           {isEnded ? (
-            dayjs(expiration_date).format("D MMMM YYYY")
+            dayjs(expiration_date).format("D MMM YYYY")
           ) : (
             <Countdown
-              // when out is time
-              onComplete={() => console.log("Countdown onComplete")}
               date={new Date(expiration_date)}
               renderer={(props) => (
                 <TimeRenderer {...props} wasted={wasted} uuid={uuid} />
@@ -149,7 +119,6 @@ const TimeRenderer = ({
   useEffect(() => {
     if (completed && !wasted) {
       setTimeout(() => store.completeChallenge(uuid), 2000);
-      //store.completeChallenge(uuid);
     }
   }, [completed]);
 

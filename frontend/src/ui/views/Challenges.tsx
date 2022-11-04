@@ -27,6 +27,11 @@ export const Challenges = observer(() => {
     else store.showModal(challenge);
   };
 
+  const orderedDisplayChallenges = [
+    ...activeChallenges,
+    ...finishedChallenges,
+  ].sort((ch1, ch2) => ch2.expiration_date - ch1.expiration_date);
+
   return (
     <Box
       sx={{
@@ -40,19 +45,12 @@ export const Challenges = observer(() => {
         <Box sx={{ flex: 1, height: "100%", padding: 2 }}>
           <List>
             <ChallengesHeader />
-            {activeChallenges.map((challenge) => (
+            {orderedDisplayChallenges.map((challenge) => (
               <ChallengeItem
                 isLoading={store.isLoading}
                 key={challenge.uuid}
                 {...challenge}
                 onComplete={() => onCompleteChallenge(challenge)}
-              />
-            ))}
-            {finishedChallenges.map((challenge) => (
-              <ChallengeItem
-                isLoading={store.isLoading}
-                key={challenge.uuid}
-                {...challenge}
               />
             ))}
           </List>
