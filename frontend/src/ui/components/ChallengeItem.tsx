@@ -28,29 +28,39 @@ export const ChallengesHeader: React.FC = ({}) => {
   );
 };
 
-interface Props extends Challenge {
+interface Props {
+  challenge: Challenge;
   onComplete?: () => void;
   isLoading: boolean;
 }
 
 export const ChallengeItem: React.FC<Props> = ({
-  uuid,
-  name,
-  bet,
-  complete_date,
-  expiration_date,
+  challenge,
   onComplete,
-  executed,
-  wasted,
   isLoading,
-  proof_type,
-  proof_data,
 }) => {
+  const {
+    executed,
+    wasted,
+    proof_type,
+    proof_data,
+    bet,
+    expiration_date,
+    complete_date,
+    uuid,
+    name,
+  } = challenge;
   const isEnded = executed || wasted;
   return (
     <React.Fragment>
       <Divider />
-      <ListItem sx={{ height: 65 }}>
+      <ListItem
+        onClick={() => isEnded && store.showProofModal(challenge)}
+        sx={{
+          height: 65,
+          ":hover": isEnded ? { bgcolor: "rgba(128, 128, 128, .25)" } : null,
+        }}
+      >
         <ListItemText sx={{ width: 300 }}>
           <Box
             sx={{

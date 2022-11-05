@@ -1,12 +1,10 @@
-import React, { FC, useEffect, useState } from "react";
-import { AvatarTypeMap, Avatar } from "@mui/material";
+import React, { FC } from "react";
+import { AvatarTypeMap, Avatar, Tooltip } from "@mui/material";
 import { DefaultComponentProps } from "@mui/material/OverridableComponent";
 import PhotoCameraFrontTwoToneIcon from "@mui/icons-material/PhotoCameraFrontTwoTone";
 import StickyNote2TwoToneIcon from "@mui/icons-material/StickyNote2TwoTone";
 import BookmarkAddedTwoToneIcon from "@mui/icons-material/BookmarkAddedTwoTone";
 import { PROOF_TYPE } from "../../near/contract";
-import { ipfs } from "../../api/ipfs";
-import { fileToBase64 } from "../../utils/helpers";
 
 interface ProofPictureProps {
   proofType: PROOF_TYPE;
@@ -25,32 +23,34 @@ export const ProofPicture: FC<Props> = ({
   sx,
   ...props
 }) => {
-  const [picSrc, setPicSrc] = useState("");
-  useEffect(() => {
-    if (proofType === PROOF_TYPE.MEDIA && proofData)
-      ipfs
-        .getFile(proofData)
-        .then((file) => fileToBase64(file).then((base64) => setPicSrc(base64)));
-  }, [proofData]);
+  let tooltip = "Without any proof info";
+  switch (proofType) {
+    case PROOF_TYPE.MEDIA:
+      tooltip = "With proof of photo";
+      break;
+    case PROOF_TYPE.TEXT:
+      tooltip = "With proof of note";
+      break;
+    default:
+      break;
+  }
 
   return (
-    <Avatar
-      onClick={console.log}
-      alt="test alt text"
-      sx={{
-        ...sx,
-        ":hover": proofData ? { bgcolor: "success.main" } : null,
-        bgcolor: isEnded
-          ? wasted
-            ? "error.main"
-            : "primary.main"
-          : "warning.main",
-      }}
-      //src={picSrc}
-      {...props}
-    >
-      <Icon proofType={proofType} />
-    </Avatar>
+    <Tooltip title={tooltip}>
+      <Avatar
+        sx={{
+          ...sx,
+          bgcolor: isEnded
+            ? wasted
+              ? "error.main"
+              : "primary.main"
+            : "warning.main",
+        }}
+        {...props}
+      >
+        <Icon proofType={proofType} />
+      </Avatar>
+    </Tooltip>
   );
 };
 

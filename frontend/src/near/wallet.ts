@@ -13,6 +13,7 @@ import {
 import { setupLedger } from "@near-wallet-selector/ledger";
 import { setupMyNearWallet } from "@near-wallet-selector/my-near-wallet";
 import { setupSender } from "@near-wallet-selector/sender";
+import { setupNearWallet } from "@near-wallet-selector/near-wallet";
 import { setupMeteorWallet } from "@near-wallet-selector/meteor-wallet";
 import { setupMathWallet } from "@near-wallet-selector/math-wallet";
 
@@ -39,6 +40,7 @@ export class UserWallet {
       network: this.network as NetworkId,
       modules: [
         setupMyNearWallet(),
+        setupNearWallet(),
         setupLedger(),
         setupSender(),
         //setupMeteorWallet(),

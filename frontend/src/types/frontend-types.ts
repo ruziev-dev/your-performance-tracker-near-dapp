@@ -17,10 +17,10 @@ export interface INewChallenge {
 }
 
 export interface AppModal {
-  challenge: Challenge
+  challenge: Challenge;
   title: string;
   subtitle: string;
   proofData: string;
-  contentType: "text" | "media";
+  contentType?: "text" | "media";
   actionName: string;
 }

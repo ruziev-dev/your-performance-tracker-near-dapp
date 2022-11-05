@@ -10,7 +10,7 @@ import { darkTheme, lightTheme } from "./ui/theme/theme";
 import { observer } from "mobx-react-lite";
 import store from "./store/store";
 import { AlertProvider } from "./ui/views/AlertProvider";
-import { AppModal } from "./ui/components/AppModal";
+import { AppModal } from "./ui/components/Modal/AppModal";
 
 const App = observer(() => {
   useEffect(() => {

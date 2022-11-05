@@ -1,4 +1,4 @@
-import { Alert, AlertTitle, AlertProps, AlertColor } from "@mui/material";
+import { Alert, AlertTitle, AlertColor } from "@mui/material";
 import React from "react";
 
 interface AppAlertProps {

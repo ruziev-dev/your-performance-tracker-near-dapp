@@ -24,7 +24,7 @@ export const Challenges = observer(() => {
   const onCompleteChallenge = (challenge: Challenge) => {
     if (challenge.proof_type === PROOF_TYPE.NONE)
       store.completeChallenge(challenge.uuid);
-    else store.showModal(challenge);
+    else store.showAddProofModal(challenge);
   };
 
   const orderedDisplayChallenges = [
@@ -49,7 +49,7 @@ export const Challenges = observer(() => {
               <ChallengeItem
                 isLoading={store.isLoading}
                 key={challenge.uuid}
-                {...challenge}
+                challenge={challenge}
                 onComplete={() => onCompleteChallenge(challenge)}
               />
             ))}

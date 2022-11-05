@@ -9,6 +9,7 @@ export interface User {
 }
 
 export interface Challenge {
+  isEnded?: boolean
   group_uuid: string;
   uuid: string;
   name: string;
@@ -19,5 +20,4 @@ export interface Challenge {
   wasted?: boolean;
   proof_type: PROOF_TYPE;
   proof_data?: string;
-  ipfs?: string;
 }

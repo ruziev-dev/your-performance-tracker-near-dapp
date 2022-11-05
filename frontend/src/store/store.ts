@@ -180,7 +180,32 @@ class Store {
     });
   }
 
-  showModal(challenge: Challenge) {
+  showProofModal(challenge: Challenge) {
+    if (challenge.proof_type === PROOF_TYPE.NONE) {
+      this.showInfoAlert(
+        `The challenge "${challenge.name}" doesn't have proof data`
+      );
+      return;
+    } else if (challenge.wasted || challenge.executed) {
+      this.showWarnAlert(
+        `The challenge "${challenge.name}" has wasted.\nYou didn't complete it with any proofs.`
+      );
+      return;
+    }
+
+    this.modalState = {
+      challenge: {
+        ...challenge,
+        isEnded: challenge.wasted || challenge.executed,
+      },
+      title: `Proof for "${challenge.name}" challenge`,
+      subtitle: "",
+      proofData: "",
+      actionName: "",
+    };
+  }
+
+  showAddProofModal(challenge: Challenge) {
     const proofType =
       challenge.proof_type === PROOF_TYPE.TEXT ? "text" : "media";
 

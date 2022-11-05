@@ -134,7 +134,6 @@ impl Contract {
             None => {}
         }
 
-
         user.challenges.insert(&uuid.to_string(), &challenge);
 
         self.users.insert(&account_name, &user);
@@ -187,7 +186,7 @@ impl Contract {
                 ProofType::MEDIA => {
                     match proof_data {
                         None => panic!("You have to add proof_data field to finish challenge"),
-                        Some(data) => { challenge.proof_data = data }
+                        Some(cid) => { challenge.proof_data = cid }
                     }
                 }
                 ProofType::NONE => {}
@@ -199,6 +198,7 @@ impl Contract {
 
         challenge.complete_date = current_time;
 
+        log!("{:?}", challenge);
 
         user.challenges.insert(&uuid, &challenge);
         self.users.insert(&account_name, &user);

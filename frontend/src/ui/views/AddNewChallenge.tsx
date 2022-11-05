@@ -134,7 +134,7 @@ export const AddNewChallenge = observer(() => {
             select
             label="Proof type"
             value={selectedProofType.value}
-            helperText="Please select your currency"
+            helperText=""
           >
             {proofType.map((option) => (
               <MenuItem
