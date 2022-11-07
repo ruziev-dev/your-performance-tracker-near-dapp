@@ -48,7 +48,7 @@ export const AlertProvider: React.FC<Props> = ({ children }) => {
       {children}
       <Stack
         sx={{
-          position: "absolute",
+          position: "fixed",
           top: 20,
           right: 20,
           gap: 1,

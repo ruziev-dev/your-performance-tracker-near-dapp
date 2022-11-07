@@ -32,6 +32,8 @@ export const Challenges = observer(() => {
     ...finishedChallenges,
   ].sort((ch1, ch2) => ch2.expiration_date - ch1.expiration_date);
 
+  console.log("orderedDisplayChallenges:", orderedDisplayChallenges);
+
   return (
     <Box
       sx={{
