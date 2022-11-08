@@ -12,6 +12,7 @@ export const UnsignedInStack: FC = () => {
   return (
     <>
       <Box
+        className="bg-svg-picture"
         sx={{
           display: "flex",
           justifyContent: "center",
@@ -21,7 +22,7 @@ export const UnsignedInStack: FC = () => {
           bgcolor: "background.default",
         }}
       ></Box>
-      <Box
+      {/*  <Box
         sx={{
           display: "flex",
           justifyContent: "center",
@@ -29,10 +30,10 @@ export const UnsignedInStack: FC = () => {
           height: "90vh",
           bgcolor: "success.main",
         }}
-      ></Box>
+      ></Box> */}
 
       <Paper
-        //elevation={4}
+        elevation={4}
         sx={{
           display: "flex",
           justifyContent: "space-around",
