@@ -1,8 +1,12 @@
-import { Typography } from "@mui/material";
+import { Typography, TypographyTypeMap } from "@mui/material";
+import { DefaultComponentProps } from "@mui/material/OverridableComponent";
 import { Box } from "@mui/system";
-import React from "react";
+import React, { FC } from "react";
 
-export const Logo = () => {
+type LogoProps = {};
+type Props = DefaultComponentProps<TypographyTypeMap<LogoProps>>;
+
+export const Logo: FC<Props> = ({ sx, ...props }) => {
   return (
     <Box>
       <Typography
@@ -13,9 +17,11 @@ export const Logo = () => {
           fontStyle: "italic",
           textTransform: "uppercase",
           textAlign: "left",
+          ...sx,
         }}
+        {...props}
       >
-        Performance Tracker
+        Performance Helper
       </Typography>
     </Box>
   );
