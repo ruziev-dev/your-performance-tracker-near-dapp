@@ -42,6 +42,11 @@ export const AddNewChallenge = observer(() => {
   const [selectedProofType, setProofType] = useState<TProofType>(defaultProof);
   const [expDate, setExpDate] = useState<Dayjs | null>(null);
 
+  const onChangeDate = (date: Dayjs | null) => {
+    if (date?.add(1, "d").add(-1, "s").isAfter(new Date())) setExpDate(date);
+    else setExpDate(null);
+  };
+
   const [isError, setError] = useState(false);
 
   const setFixValue = (percantage: number) => () => {
@@ -63,7 +68,7 @@ export const AddNewChallenge = observer(() => {
     newValue.replace(",", ".");
 
     const numValue = Number(newValue);
-    if (numValue >= nearAccountBalance) setError(true);
+    if (numValue > nearAccountBalance) setError(true);
     else setError(false);
 
     if (regex.test(newValue) || newValue === "") {
@@ -150,9 +155,7 @@ export const AddNewChallenge = observer(() => {
             label="Expiration date"
             value={expDate}
             minDate={dayjs(new Date())}
-            onChange={(newValue) => {
-              setExpDate(newValue);
-            }}
+            onChange={onChangeDate}
             renderInput={(params) => <TextField {...params} />}
           />
           <ActionButton
