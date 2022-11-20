@@ -2,7 +2,7 @@ import "regenerator-runtime/runtime";
 import "../assets/global.css";
 
 import React, { useEffect } from "react";
-import { BrowserRouter } from "react-router-dom";
+import { BrowserRouter, HashRouter } from "react-router-dom";
 import { SignedInStack } from "./ui/pages/SignedInStack";
 import { UnsignedInStack } from "./ui/pages/UnsignedInStack";
 import { CssBaseline, ThemeProvider } from "@mui/material";
@@ -11,6 +11,7 @@ import { observer } from "mobx-react-lite";
 import store from "./store/store";
 import { AlertProvider } from "./ui/views/AlertProvider";
 import { AppModal } from "./ui/components/Modal/AppModal";
+import { AppLoader } from "./ui/components/AppLoader";
 
 const App = observer(() => {
   useEffect(() => {
@@ -18,15 +19,20 @@ const App = observer(() => {
   }, []);
 
   return (
-    <BrowserRouter>
+    <HashRouter>
       <ThemeProvider theme={store.isDarkTheme ? darkTheme : lightTheme}>
-        <AlertProvider>
-          <CssBaseline />
-          {store.isSignedIn ? <SignedInStack /> : <UnsignedInStack />}
-          <AppModal />
-        </AlertProvider>
+        {store.isAppInit ? (
+          <AlertProvider>
+            <CssBaseline />
+            {store.isSignedIn ? <SignedInStack /> : <UnsignedInStack />}
+            <AppModal />
+          </AlertProvider>
+        ) : (
+          <AppLoader />
+        )}
       </ThemeProvider>
-    </BrowserRouter>
+    </HashRouter>
   );
 });
+
 export default <App />;

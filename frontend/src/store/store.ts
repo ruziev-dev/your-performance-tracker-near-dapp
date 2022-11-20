@@ -22,7 +22,7 @@ class Store {
 
   isSignedIn = false;
   isLoading = false;
-  isAppInit = true;
+  isAppInit = false;
   isDarkTheme = true;
 
   modalState: AppModal | null = null;
