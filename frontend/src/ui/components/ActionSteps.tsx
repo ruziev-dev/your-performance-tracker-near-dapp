@@ -21,7 +21,7 @@ const steps = [
   },
   {
     label: "COMPLETE YOUR PERSONAL CHALLENGE BEFORE DEALINE",
-    description: `Or you will lost your bet for the challenge after expiration date`,
+    description: `Otherwise you will lost your bet for the challenge after expiration date.`,
   },
 ];
 
@@ -67,6 +67,13 @@ export const ActionSteps = () => {
           </Box>
         </Stack>
       ))}
+
+      <Typography typography="body1" sx={{mt: 5}}>
+        You have to do some tasks which were declared on your challenge and add
+        proof information. It could be called like "Proof of Honest" or "Proof
+        of Conscience" because of you can add fake data to proof challenge and
+        get your bet back but delude youself is the worst you can do!
+      </Typography>
     </Box>
   );
 };

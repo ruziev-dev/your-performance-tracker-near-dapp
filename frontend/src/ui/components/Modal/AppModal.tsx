@@ -6,6 +6,7 @@ import { DisplayText } from "../../atoms/DisplayText";
 import { PROOF_TYPE } from "../../../near/contract";
 import { ShowProofModal } from "./ShowProofModal";
 import { AddProofModal } from "./AddProofModal";
+import { APP_MODAL_TYPE } from "../../../types/frontend-types";
 
 export const AppModal = observer(() => {
   const [fileValue, setFile] = useState<File | null>(null);
@@ -56,9 +57,10 @@ export const AppModal = observer(() => {
       <Box sx={style}>
         <DisplayText>{store?.modalState?.title}</DisplayText>
 
-        {store?.modalState?.challenge.isEnded ? (
+        {store.modalState?.viewType === APP_MODAL_TYPE.SHOW_PROOF_DATA && (
           <ShowProofModal />
-        ) : (
+        )}
+        {store.modalState?.viewType === APP_MODAL_TYPE.INPUT_PROOF_FORM && (
           <AddProofModal
             onChangeValue={onChangeValue}
             onClickButton={onClickButton}

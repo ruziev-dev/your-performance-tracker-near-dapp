@@ -16,7 +16,13 @@ export interface INewChallenge {
   expiration: number;
 }
 
+export enum APP_MODAL_TYPE {
+  INPUT_PROOF_FORM,
+  SHOW_PROOF_DATA,
+}
+
 export interface AppModal {
+  viewType: APP_MODAL_TYPE;
   challenge: Challenge;
   title: string;
   subtitle: string;

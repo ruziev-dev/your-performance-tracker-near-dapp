@@ -4,7 +4,11 @@ import { AccountBalance } from "near-api-js/lib/account";
 import { Contract, PROOF_TYPE } from "../near/contract";
 import { UserWallet } from "../near/wallet";
 import { Challenge, User } from "../types/contract-entities";
-import { AppModal, INewChallenge } from "../types/frontend-types";
+import {
+  AppModal,
+  APP_MODAL_TYPE,
+  INewChallenge,
+} from "../types/frontend-types";
 import { showAlertGlobal } from "../ui/views/AlertProvider";
 import { ipfs } from "../api/ipfs";
 
@@ -181,19 +185,28 @@ class Store {
   }
 
   showProofModal(challenge: Challenge) {
-    if (challenge.proof_type === PROOF_TYPE.NONE) {
-      this.showInfoAlert(
-        `The challenge "${challenge.name}" doesn't have proof data`
-      );
-      return;
-    } else if (challenge.wasted || challenge.executed) {
+    if (challenge.wasted) {
       this.showWarnAlert(
         `The challenge "${challenge.name}" has wasted.\nYou didn't complete it with any proofs.`
       );
       return;
     }
 
+    switch (challenge.proof_type) {
+      case PROOF_TYPE.NONE: {
+        this.showInfoAlert(
+          `The challenge "${challenge.name}" doesn't have proof data`
+        );
+        return;
+      }
+      case PROOF_TYPE.MEDIA: {
+      }
+      case PROOF_TYPE.TEXT: {
+      }
+    }
+
     this.modalState = {
+      viewType: APP_MODAL_TYPE.SHOW_PROOF_DATA,
       challenge: {
         ...challenge,
         isEnded: challenge.wasted || challenge.executed,
@@ -210,6 +223,7 @@ class Store {
       challenge.proof_type === PROOF_TYPE.TEXT ? "text" : "media";
 
     this.modalState = {
+      viewType: APP_MODAL_TYPE.INPUT_PROOF_FORM,
       challenge,
       title: "Add proof data to the challenge",
       subtitle: `You have set ${proofType}-note proof type to challenge "${challenge.name}"`,
